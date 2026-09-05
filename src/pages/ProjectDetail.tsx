@@ -17,6 +17,7 @@ import {
   CheckCircle2, Clock, Upload, Sparkles, ChevronRight, Users, UserPlus, X, Send,
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import TeamCenter from '@/components/team/TeamCenter';
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -73,9 +74,9 @@ export default function ProjectDetail() {
     ? candidateEngineers.map((e) => ({ id: e.user_id ?? '', name: e.name, photo_url: e.photo_url, location: e.location, verified: e.verification_status === 'verified', meta: e.qualification }))
     : candidateProfiles.map((p) => ({ id: p.user_id, name: p.business_name ?? p.name, photo_url: p.photo_url, location: p.location, verified: p.verification_status === 'verified', meta: p.specializations.slice(0, 2).join(', ') }));
 
-  const openInvite = () => {
-    setInviteType('engineer');
-    setInviteTarget('');
+  const openInvite = (type: ProfessionalType = 'engineer', preselectUserId?: string) => {
+    setInviteType(type);
+    setInviteTarget(preselectUserId ?? '');
     setInviteForm({ title: '', description: '', budget: '', expected_date: '' });
     setInviteOpen(true);
   };
@@ -234,6 +235,18 @@ export default function ProjectDetail() {
         </div>
       </div>
 
+      {/* Team discovery & comparison — homeowner team center */}
+      {isOwner && (
+        <TeamCenter
+          project={project}
+          engineers={engineers}
+          profiles={profiles}
+          members={members}
+          proRequests={proRequests}
+          onInvite={(type, preselectUserId) => openInvite(type, preselectUserId)}
+        />
+      )}
+
       {/* Project team — all assigned professionals grouped by role */}
       <div className="card p-6">
         <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
@@ -243,7 +256,7 @@ export default function ProjectDetail() {
             <Badge variant="navy">{teamRows.length} assigned</Badge>
           </div>
           {isOwner && (
-            <button onClick={openInvite} className="btn-primary text-sm"><UserPlus className="w-4 h-4" /> Request Professional</button>
+            <button onClick={() => openInvite()} className="btn-primary text-sm"><UserPlus className="w-4 h-4" /> Request Professional</button>
           )}
         </div>
         {groupedTeams.length === 0 ? (
