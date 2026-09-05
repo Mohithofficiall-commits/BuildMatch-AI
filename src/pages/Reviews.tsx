@@ -3,6 +3,7 @@ import { fetchReviews, fetchEngineers } from '@/lib/data';
 import type { Review, Engineer } from '@/lib/types';
 import { LoadingState, EmptyState, Badge, RatingStars, Modal, Toast } from '@/components/ui';
 import { Star, ShieldCheck, Quote, Plus } from 'lucide-react';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -61,7 +62,7 @@ export default function Reviews() {
               <div key={r.id} className="card p-5">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    {eng && <img src={eng.photo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />}
+                    {eng && <img src={personPhoto(eng.photo_url, 'engineer')} alt="" onError={(e) => onPersonImgError(e, 'engineer')} className="w-10 h-10 rounded-lg object-cover" />}
                     <div>
                       <div className="flex items-center gap-2">
                         <p className="font-semibold text-navy-900">{r.homeowner_name}</p>

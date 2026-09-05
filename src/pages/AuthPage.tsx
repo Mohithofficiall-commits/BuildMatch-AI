@@ -3,17 +3,18 @@ import { Link, useNavigate } from 'react-router-dom';
 import { HardHat, ArrowRight, ShieldCheck, Sparkles, FileBadge, Mail, Lock, User, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { roleLandingPath } from '@/lib/portal';
+import { personPhoto } from '@/lib/people';
 import type { UserRole } from '@/lib/types';
 
 const ALL_ROLES: UserRole[] = ['homeowner', 'engineer', 'plumber', 'electrician', 'material_shop', 'admin'];
 
 const DEMO_ACCOUNTS: Record<string, { id: string; name: string; role: UserRole; location: string; avatar_url: string }> = {
-  'nishi.sharma@example.com': { id: 'a1000000-0000-0000-0000-000000000001', name: 'Nishi Sharma', role: 'homeowner', location: 'Coimbatore', avatar_url: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop' },
-  'karthik@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000003', name: 'Er. S. Karthik', role: 'engineer', location: 'Coimbatore', avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop' },
-  'rajesh@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000010', name: 'Rajesh Kumar', role: 'plumber', location: 'Coimbatore', avatar_url: 'https://images.unsplash.com/photo-1633332755192-780a8825d60c?w=200&h=200&fit=crop' },
-  'spark@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000011', name: 'Suresh Kumar', role: 'electrician', location: 'Coimbatore', avatar_url: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7150?w=200&h=200&fit=crop' },
-  'buildmart@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000012', name: 'Mohan Lal', role: 'material_shop', location: 'Coimbatore', avatar_url: 'https://images.unsplash.com/photo-1565008447762-0bd3c6e5951f?w=200&h=200&fit=crop' },
-  'admin@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000002', name: 'Admin User', role: 'admin', location: 'Bengaluru', avatar_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4f?w=200&h=200&fit=crop' },
+  'nishi.sharma@example.com': { id: 'a1000000-0000-0000-0000-000000000001', name: 'Nishi Sharma', role: 'homeowner', location: 'Coimbatore', avatar_url: '/people/homeowner-1.jpg' },
+  'karthik@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000003', name: 'Er. S. Karthik', role: 'engineer', location: 'Coimbatore', avatar_url: '/people/engineer-1.jpg' },
+  'rajesh@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000010', name: 'Rajesh Kumar', role: 'plumber', location: 'Coimbatore', avatar_url: '/people/plumber-1.jpg' },
+  'spark@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000011', name: 'Suresh Kumar', role: 'electrician', location: 'Coimbatore', avatar_url: '/people/electrician-1.jpg' },
+  'buildmart@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000012', name: 'Mohan Lal', role: 'material_shop', location: 'Coimbatore', avatar_url: '/people/shop-1.jpg' },
+  'admin@buildmatch.ai': { id: 'a1000000-0000-0000-0000-000000000002', name: 'Admin User', role: 'admin', location: 'Bengaluru', avatar_url: '/people/admin-1.jpg' },
 };
 
 const DEMO_EMOJI: Record<UserRole, string> = {
@@ -51,7 +52,7 @@ export default function AuthPage({ mode }: { mode: 'login' | 'signup' }) {
           setLoading(false);
           return;
         }
-        login({ id: crypto.randomUUID(), name, email, role, location: '', avatar_url: `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}` });
+        login({ id: crypto.randomUUID(), name, email, role, location: '', avatar_url: personPhoto(undefined, role) });
         navigate(roleLandingPath(role));
       }
     }, 600);

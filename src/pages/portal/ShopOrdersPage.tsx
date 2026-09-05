@@ -5,6 +5,7 @@ import type { MaterialOrder, Material, AppUser, Project } from '@/lib/types';
 import { LoadingState, EmptyState, Badge, Toast, formatINR, formatDate } from '@/components/ui';
 import { orderStatus } from '@/components/professional/statuses';
 import { ShoppingCart, CheckCircle2, Truck, PackageCheck, XCircle, MapPin } from 'lucide-react';
+import { onMaterialImgError } from '@/lib/people';
 
 const FILTERS = ['all', 'pending', 'confirmed', 'shipped', 'delivered', 'cancelled'] as const;
 
@@ -102,7 +103,7 @@ export default function ShopOrdersPage() {
               <div key={o.id} className="card p-5">
                 <div className="flex items-start gap-4 flex-wrap">
                   {material?.image_url
-                    ? <img src={material.image_url} alt="" className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                    ? <img src={material.image_url} alt="" onError={onMaterialImgError} className="w-14 h-14 rounded-xl object-cover shrink-0" />
                     : <div className="w-14 h-14 rounded-xl bg-navy-50 flex items-center justify-center text-navy-300 shrink-0"><PackageCheck className="w-6 h-6" /></div>}
                   <div className="flex-1 min-w-[200px]">
                     <div className="flex items-center gap-2 flex-wrap">

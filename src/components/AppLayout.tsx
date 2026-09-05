@@ -7,6 +7,7 @@ import {
   LogOut, Menu, HardHat,
 } from 'lucide-react';
 import { useState } from 'react';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 const navItems = [
   { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -72,7 +73,7 @@ export default function AppLayout() {
 
       <div className="px-3 py-4 border-t border-navy-100">
         <div className="flex items-center gap-3 px-3 py-2 rounded-xl bg-navy-50">
-          <img src={user?.avatar_url ?? `https://ui-avatars.com/api/?name=${user?.name}`} alt="" className="w-9 h-9 rounded-full object-cover" />
+          <img src={personPhoto(user?.avatar_url, user?.role)} alt="" onError={(e) => onPersonImgError(e, user?.role)} className="w-9 h-9 rounded-full object-cover" />
           <div className="flex-1 min-w-0">
             <p className="text-sm font-semibold text-navy-900 truncate">{user?.name}</p>
             <p className="text-xs muted capitalize">{user?.role}</p>
@@ -115,7 +116,7 @@ export default function AppLayout() {
             </div>
             <span className="font-bold text-navy-900 text-sm">BuildMatch AI</span>
           </div>
-          <img src={user?.avatar_url ?? `https://ui-avatars.com/api/?name=${user?.name}`} alt="" className="w-8 h-8 rounded-full object-cover" />
+          <img src={personPhoto(user?.avatar_url, user?.role)} alt="" onError={(e) => onPersonImgError(e, user?.role)} className="w-8 h-8 rounded-full object-cover" />
         </header>
 
         <main className="p-4 lg:p-8 max-w-7xl mx-auto">

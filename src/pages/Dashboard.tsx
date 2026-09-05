@@ -6,6 +6,7 @@ import { fetchEngineers, fetchProjects } from '@/lib/data';
 import { rankEngineers } from '@/lib/matching';
 import type { Engineer, Project, ProjectRequirement } from '@/lib/types';
 import { Badge, RatingStars, TrustBadge, LoadingState, formatINR } from '@/components/ui';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -160,7 +161,7 @@ export default function Dashboard() {
           {matches.map((m) => (
             <div key={m.engineer.id} className="card p-5 card-hover cursor-pointer" onClick={() => navigate(`/app/engineers/${m.engineer.id}`)}>
               <div className="flex items-start gap-3 mb-3">
-                <img src={m.engineer.photo_url} alt={m.engineer.name} className="w-14 h-14 rounded-xl object-cover" />
+                <img src={personPhoto(m.engineer.photo_url, 'engineer')} alt={m.engineer.name} onError={(e) => onPersonImgError(e, 'engineer')} className="w-14 h-14 rounded-xl object-cover" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
                     <p className="font-semibold text-navy-900 truncate">{m.engineer.name}</p>

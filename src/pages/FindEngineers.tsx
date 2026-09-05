@@ -6,6 +6,7 @@ import { rankEngineers } from '@/lib/matching';
 import { useCompare } from '@/lib/compare';
 import type { Engineer, ProjectRequirement } from '@/lib/types';
 import { Badge, RatingStars, TrustBadge, LoadingState, EmptyState } from '@/components/ui';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 export default function FindEngineers() {
   const navigate = useNavigate();
@@ -161,7 +162,7 @@ export default function FindEngineers() {
             return (
               <div key={e.id} className="card p-5 card-hover">
                 <div className="flex items-start gap-3 mb-4">
-                  <img src={e.photo_url} alt={e.name} className="w-16 h-16 rounded-xl object-cover" />
+                  <img src={personPhoto(e.photo_url, 'engineer')} alt={e.name} onError={(e) => onPersonImgError(e, 'engineer')} className="w-16 h-16 rounded-xl object-cover" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <p className="font-semibold text-navy-900 truncate">{e.name}</p>

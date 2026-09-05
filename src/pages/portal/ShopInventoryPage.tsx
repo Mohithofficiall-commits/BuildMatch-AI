@@ -7,6 +7,7 @@ import { availabilityStatus } from '@/components/professional/statuses';
 import {
   Package, Search, Plus, Pencil, Trash2, Minus, ImageOff, AlertTriangle,
 } from 'lucide-react';
+import { onMaterialImgError } from '@/lib/people';
 
 const CATEGORIES = ['Cement', 'Steel', 'Bricks', 'Sand', 'Electrical', 'Plumbing', 'Tiles', 'Paint', 'Hardware', 'Other'];
 
@@ -164,7 +165,7 @@ export default function ShopInventoryPage() {
               <div key={m.id} className="card p-5">
                 <div className="flex items-start gap-3 mb-3">
                   {m.image_url
-                    ? <img src={m.image_url} alt={m.name} className="w-14 h-14 rounded-xl object-cover shrink-0" />
+                    ? <img src={m.image_url} alt={m.name} onError={onMaterialImgError} className="w-14 h-14 rounded-xl object-cover shrink-0" />
                     : <div className="w-14 h-14 rounded-xl bg-navy-50 flex items-center justify-center text-navy-300 shrink-0"><ImageOff className="w-6 h-6" /></div>}
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-navy-900 text-sm leading-snug">{m.name}</p>

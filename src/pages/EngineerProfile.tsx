@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth';
 import type { Engineer, Review, ProjectRequirement, Project } from '@/lib/types';
 import { Badge, VerifiedBadge, RatingStars, LoadingState, EmptyState, ProgressBar, Modal, Toast, formatINR } from '@/components/ui';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, Radar, Cell } from 'recharts';
+import { personPhoto, onPersonImgError, onProjectImgError } from '@/lib/people';
 
 export default function EngineerProfile() {
   const { id } = useParams();
@@ -72,7 +73,7 @@ export default function EngineerProfile() {
       {/* Header */}
       <div className="card p-6 lg:p-8">
         <div className="flex flex-col lg:flex-row gap-6">
-          <img src={engineer.photo_url} alt={engineer.name} className="w-24 h-24 rounded-2xl object-cover" />
+          <img src={personPhoto(engineer.photo_url, 'engineer')} alt={engineer.name} onError={(e) => onPersonImgError(e, 'engineer')} className="w-24 h-24 rounded-2xl object-cover" />
           <div className="flex-1">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-bold text-navy-900">{engineer.name}</h1>
@@ -196,7 +197,7 @@ export default function EngineerProfile() {
           {engineer.portfolio.map((p, i) => (
             <div key={i} className="rounded-xl overflow-hidden border border-navy-100 group">
               <div className="relative h-40 overflow-hidden">
-                <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <img src={p.image} alt={p.title} onError={onProjectImgError} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute top-2 right-2"><Badge variant="success">Completed</Badge></div>
               </div>
               <div className="p-3">

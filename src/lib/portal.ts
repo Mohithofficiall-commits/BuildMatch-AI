@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Engineer, ProfessionalProfile, UserRole } from './types';
 import { fetchEngineerByUserId, fetchProfessionalProfilesForUser } from './data';
 import { useAuth } from './auth';
+import { personPhoto } from './people';
 
 export type ProfessionalRole = Exclude<UserRole, 'homeowner' | 'admin'>;
 
@@ -98,8 +99,7 @@ export function profileDisplayName(p: ProfessionalProfileRow): string {
 }
 
 export function profilePhoto(p: ProfessionalProfileRow): string {
-  if ('photo_url' in p && p.photo_url) return p.photo_url;
-  return 'https://ui-avatars.com/api/?name=' + encodeURIComponent(profileName(p));
+  return personPhoto('photo_url' in p ? p.photo_url : undefined, 'profession' in p ? p.profession : undefined);
 }
 
 export function isVerified(p: ProfessionalProfileRow | null): boolean {

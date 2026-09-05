@@ -4,6 +4,7 @@ import { fetchProjects } from '@/lib/data';
 import type { Project } from '@/lib/types';
 import { LoadingState, EmptyState, Badge, formatINR, formatDate } from '@/components/ui';
 import { FolderKanban, MapPin, ArrowRight, Plus, CalendarClock } from 'lucide-react';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 const statusColors: Record<string, 'navy' | 'royal' | 'success' | 'warning'> = {
   active: 'royal', completed: 'success', planning: 'navy', on_hold: 'warning',
@@ -53,7 +54,7 @@ export default function MyProjects() {
               </div>
               {p.engineer && (
                 <div className="flex items-center gap-2 mb-3 text-sm">
-                  <img src={p.engineer.photo_url} alt="" className="w-7 h-7 rounded-full object-cover" />
+                  <img src={personPhoto(p.engineer.photo_url, 'engineer')} alt="" onError={(e) => onPersonImgError(e, 'engineer')} className="w-7 h-7 rounded-full object-cover" />
                   <span className="text-navy-700">{p.engineer.name}</span>
                 </div>
               )}

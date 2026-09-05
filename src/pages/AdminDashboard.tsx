@@ -8,6 +8,7 @@ import type { Engineer, Complaint, Project, MilestoneEvidence, VerificationReque
 import { LoadingState, Badge, Toast, formatDate } from '@/components/ui';
 import { verificationStatus } from '@/components/professional/statuses';
 import { ShieldCheck, AlertTriangle, Camera, Star, CheckCircle2, XCircle, FileText, FolderKanban, Award, Send } from 'lucide-react';
+import { personPhoto, onPersonImgError, onProjectImgError } from '@/lib/people';
 
 export default function AdminDashboard() {
   const [engineers, setEngineers] = useState<Engineer[]>([]);
@@ -119,7 +120,7 @@ export default function AdminDashboard() {
             pendingEngineers.map((e) => (
               <div key={e.id} className="card p-5">
                 <div className="flex items-start gap-4 flex-wrap">
-                  <img src={e.photo_url} alt={e.name} className="w-14 h-14 rounded-xl object-cover" />
+                  <img src={personPhoto(e.photo_url, 'engineer')} alt={e.name} onError={(e) => onPersonImgError(e, 'engineer')} className="w-14 h-14 rounded-xl object-cover" />
                   <div className="flex-1 min-w-[200px]">
                     <p className="font-semibold text-navy-900">{e.name}</p>
                     <p className="text-xs muted">{e.qualification}</p>
@@ -167,7 +168,7 @@ export default function AdminDashboard() {
           {flaggedEvidence.length === 0 ? <div className="card p-8 text-center"><p className="text-sm muted">No flagged milestones.</p></div> : (
             flaggedEvidence.map((ev) => (
               <div key={ev.id} className="card p-5 flex items-start gap-4">
-                {ev.image_url && <img src={ev.image_url} alt="" className="w-20 h-20 rounded-lg object-cover" />}
+                {ev.image_url && <img src={ev.image_url} alt="" onError={onProjectImgError} className="w-20 h-20 rounded-lg object-cover" />}
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <Badge variant={ev.result === 'verified' ? 'verified' : 'warning'}>{ev.result === 'verified' ? 'VERIFIED' : 'REVIEW REQUIRED'}</Badge>
@@ -232,7 +233,7 @@ export default function AdminDashboard() {
               return (
                 <div key={vr.id} className="card p-5">
                   <div className="flex items-start gap-4 flex-wrap">
-                    <img src={vr.app_user?.avatar_url ?? `https://ui-avatars.com/api/?name=${vr.app_user?.name ?? 'User'}`} alt="" className="w-12 h-12 rounded-xl object-cover" />
+                    <img src={personPhoto(vr.app_user?.avatar_url, vr.app_user?.role)} alt="" onError={(e) => onPersonImgError(e, vr.app_user?.role)} className="w-12 h-12 rounded-xl object-cover" />
                     <div className="flex-1 min-w-[200px]">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-semibold text-navy-900">{vr.app_user?.name ?? 'Unknown user'}</p>

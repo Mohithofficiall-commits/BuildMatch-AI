@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import TeamCenter from '@/components/team/TeamCenter';
+import { personPhoto, onPersonImgError, onProjectImgError, PROJECT_PHOTO_FALLBACK } from '@/lib/people';
 
 export default function ProjectDetail() {
   const { id } = useParams();
@@ -142,7 +143,7 @@ export default function ProjectDetail() {
       const detected = stages[expected] ?? stages.Roofing;
       setAnalysisResult({
         id: crypto.randomUUID(), milestone_id: selectedMilestone, project_id: id,
-        image_url: 'https://images.unsplash.com/photo-1503387762-592deb58ef22?w=800&h=600&fit=crop',
+        image_url: PROJECT_PHOTO_FALLBACK,
         detected_stage: expected, confidence: detected.conf, expected_milestone: expected,
         evidence_tags: detected.tags, result: 'verified', human_status: 'pending',
       });
@@ -228,7 +229,7 @@ export default function ProjectDetail() {
           </div>
           {project.engineer && (
             <div className="flex items-center gap-3 bg-navy-50 rounded-xl p-3">
-              <img src={project.engineer.photo_url} alt="" className="w-10 h-10 rounded-lg object-cover" />
+              <img src={personPhoto(project.engineer.photo_url, 'engineer')} alt="" onError={(e) => onPersonImgError(e, 'engineer')} className="w-10 h-10 rounded-lg object-cover" />
               <div><p className="text-xs muted">Engineer</p><p className="font-semibold text-navy-900 text-sm">{project.engineer.name}</p></div>
             </div>
           )}
@@ -269,9 +270,7 @@ export default function ProjectDetail() {
                 <div className="space-y-2">
                   {g.rows.map((r) => (
                     <div key={r.key} className="flex items-center gap-2.5">
-                      {r.photo
-                        ? <img src={r.photo} alt="" className="w-8 h-8 rounded-lg object-cover" />
-                        : <div className="w-8 h-8 rounded-lg bg-navy-100 flex items-center justify-center text-xs font-bold text-navy-600">{r.name.charAt(0)}</div>}
+                      <img src={personPhoto(r.photo, r.role)} alt="" onError={(e) => onPersonImgError(e, r.role)} className="w-8 h-8 rounded-lg object-cover" />
                       <span className="text-sm font-semibold text-navy-900 flex-1 truncate">{r.name}</span>
                       {r.verified && <VerifiedBadge size="xs" />}
                       {r.role === 'engineer' && r.status === 'assigned' && <Badge variant="navy">Assigned</Badge>}
@@ -424,7 +423,7 @@ export default function ProjectDetail() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {evidence.map((ev) => (
               <div key={ev.id} className="border border-navy-100 rounded-xl overflow-hidden">
-                {ev.image_url && <img src={ev.image_url} alt="" className="w-full h-32 object-cover" />}
+                {ev.image_url && <img src={ev.image_url} alt="" onError={onProjectImgError} className="w-full h-32 object-cover" />}
                 <div className="p-3">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-navy-900">{ev.detected_stage}</span>
@@ -507,7 +506,7 @@ export default function ProjectDetail() {
           )}
           {analysisResult && !analyzing && (
             <div className="space-y-4 animate-fade-in">
-              <div className="rounded-xl overflow-hidden border border-navy-100"><img src={analysisResult.image_url ?? ''} alt="" className="w-full h-48 object-cover" /></div>
+              <div className="rounded-xl overflow-hidden border border-navy-100"><img src={analysisResult.image_url || PROJECT_PHOTO_FALLBACK} alt="" onError={onProjectImgError} className="w-full h-48 object-cover" /></div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-navy-50 rounded-xl p-4"><p className="text-xs muted">Detected Stage</p><p className="text-lg font-bold text-navy-900">{analysisResult.detected_stage}</p></div>
                 <div className="bg-navy-50 rounded-xl p-4"><p className="text-xs muted">Confidence</p><p className="text-lg font-bold text-royal-600">{analysisResult.confidence}%</p></div>
@@ -568,7 +567,7 @@ export default function ProjectDetail() {
                 {candidates.map((c) => (
                   <label key={c.id} className={`flex items-center gap-3 border rounded-xl p-3 cursor-pointer transition-all ${inviteTarget === c.id ? 'border-royal-500 bg-royal-50' : 'border-navy-100 hover:bg-navy-50'}`}>
                     <input type="radio" name="candidate" checked={inviteTarget === c.id} onChange={() => setInviteTarget(c.id)} className="accent-royal-600" />
-                    {c.photo_url && <img src={c.photo_url} alt="" className="w-9 h-9 rounded-lg object-cover" />}
+                    <img src={personPhoto(c.photo_url, inviteType)} alt="" onError={(e) => onPersonImgError(e, inviteType)} className="w-9 h-9 rounded-lg object-cover" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-navy-900 truncate">{c.name} {c.verified && '✓'}</p>
                       <p className="text-xs muted truncate">{c.location} · {c.meta}</p>

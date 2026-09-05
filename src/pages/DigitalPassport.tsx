@@ -3,6 +3,7 @@ import { fetchProjects, fetchMilestones, fetchPayments, fetchDocuments, fetchRev
 import type { Project, Milestone, Payment, DocumentItem, Review, Complaint, RiskAssessment, MilestoneEvidence } from '@/lib/types';
 import { LoadingState, Badge, formatINR, formatDate, MilestoneIcon } from '@/components/ui';
 import { FileBadge, ShieldCheck, Download, Printer, CheckCircle2, Clock, Wallet, AlertTriangle, Camera, FileText, Star } from 'lucide-react';
+import { onProjectImgError } from '@/lib/people';
 
 export default function DigitalPassport() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -121,7 +122,7 @@ export default function DigitalPassport() {
               <div className="grid md:grid-cols-3 gap-3">
                 {evidence.map((ev) => (
                   <div key={ev.id} className="border border-navy-100 rounded-xl overflow-hidden">
-                    {ev.image_url && <img src={ev.image_url} alt="" className="w-full h-24 object-cover" />}
+                    {ev.image_url && <img src={ev.image_url} alt="" onError={onProjectImgError} className="w-full h-24 object-cover" />}
                     <div className="p-2"><p className="text-xs font-semibold text-navy-900">{ev.detected_stage} ({ev.confidence}%)</p><p className="text-[10px] muted">Human: {ev.human_status}</p></div>
                   </div>
                 ))}

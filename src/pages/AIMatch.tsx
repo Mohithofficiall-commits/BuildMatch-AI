@@ -6,6 +6,7 @@ import type { Engineer, ProjectRequirement } from '@/lib/types';
 import { Badge, RatingStars, TrustBadge, LoadingState, ProgressBar } from '@/components/ui';
 import { Sparkles, MapPin, Home, Ruler, Wallet, Palette, CalendarClock, ArrowRight, ShieldCheck, Info, TrendingUp } from 'lucide-react';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer } from 'recharts';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 export default function AIMatch() {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ export default function AIMatch() {
                 <div className="grid lg:grid-cols-3 gap-6">
                   <div>
                     <div className="flex items-center gap-3 mb-3">
-                      <img src={m.engineer.photo_url} alt={m.engineer.name} className="w-14 h-14 rounded-xl object-cover" />
+                      <img src={personPhoto(m.engineer.photo_url, 'engineer')} alt={m.engineer.name} onError={(e) => onPersonImgError(e, 'engineer')} className="w-14 h-14 rounded-xl object-cover" />
                       <div>
                         <div className="flex items-center gap-1.5">
                           <p className="font-semibold text-navy-900">{m.engineer.name}</p>

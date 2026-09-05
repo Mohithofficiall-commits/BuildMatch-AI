@@ -14,6 +14,7 @@ import type {
 } from '@/lib/types';
 import { Badge, VerifiedBadge, RatingStars, LoadingState, formatINR, formatDate, Modal } from '@/components/ui';
 import { memberStatus, requestStatus } from '@/components/professional/statuses';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 interface TeamCenterProps {
   project: Project;
@@ -251,7 +252,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
               return (
                 <div key={e.id} className={`border rounded-xl p-4 transition-all ${focused ? 'border-royal-300 bg-royal-50/40 shadow-glow' : 'border-navy-100 hover:border-navy-200'}`}>
                   <div className="flex items-start gap-3 mb-3">
-                    <img src={e.photo_url} alt="" className="w-12 h-12 rounded-xl object-cover" />
+                    <img src={personPhoto(e.photo_url, 'engineer')} alt="" onError={(e) => onPersonImgError(e, 'engineer')} className="w-12 h-12 rounded-xl object-cover" />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <p className="font-semibold text-navy-900 truncate">{e.name}</p>
@@ -335,7 +336,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
                       const collab = eg.userId ? collabByUser.get(eg.userId) : undefined;
                       return (
                         <div key={i} className="flex items-start gap-2.5 bg-emerald-50/60 border border-emerald-100 rounded-lg p-2.5">
-                          {eg.photo ? <img src={eg.photo} alt="" className="w-8 h-8 rounded-lg object-cover" /> : <div className="w-8 h-8 rounded-lg bg-navy-100 flex items-center justify-center text-xs font-bold text-navy-600">{eg.name.charAt(0)}</div>}
+                          <img src={personPhoto(eg.photo, role)} alt="" onError={(e) => onPersonImgError(e, role)} className="w-8 h-8 rounded-lg object-cover" />
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-semibold text-navy-900">{eg.name} {eg.verified && <VerifiedBadge size="xs" />}</p>
                             {prof && (
@@ -369,7 +370,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
                         const collab = userId ? collabByUser.get(userId) : undefined;
                         return (
                           <div key={c.id} className="flex items-start gap-2 border border-navy-100 rounded-lg p-2.5">
-                            {c.photo_url ? <img src={c.photo_url ?? ''} alt="" className="w-8 h-8 rounded-lg object-cover" /> : <div className="w-8 h-8 rounded-lg bg-navy-100 flex items-center justify-center text-xs font-bold text-navy-600">{name.charAt(0)}</div>}
+                            <img src={personPhoto(c.photo_url, role)} alt="" onError={(e) => onPersonImgError(e, role)} className="w-8 h-8 rounded-lg object-cover" />
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-navy-900 truncate">{name} {verified && <VerifiedBadge size="xs" />} {already && <Badge variant="success">On team</Badge>}</p>
                               <p className="text-[11px] muted truncate">
@@ -522,7 +523,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
                     className={`border rounded-xl p-3 text-left transition-all ${selected ? 'border-royal-500 bg-royal-50' : 'border-navy-100 hover:border-navy-300'}`}
                   >
                     <div className="flex items-center gap-2.5 mb-2">
-                      {photo ? <img src={photo} alt="" className="w-9 h-9 rounded-lg object-cover" /> : <div className="w-9 h-9 rounded-lg bg-navy-100 flex items-center justify-center text-xs font-bold">{name.charAt(0)}</div>}
+                      <img src={personPhoto(photo, compareType)} alt="" onError={(e) => onPersonImgError(e, compareType)} className="w-9 h-9 rounded-lg object-cover" />
                       <div className="min-w-0 flex-1">
                         <p className="text-sm font-semibold text-navy-900 truncate">{name}</p>
                         <p className="text-[11px] muted truncate">{c.location}</p>
@@ -613,7 +614,7 @@ function DetailBody({ row, project, onRequest, collab }: {
   return (
     <div className="space-y-4">
       <div className="flex items-start gap-3">
-        {photo ? <img src={photo} alt="" className="w-14 h-14 rounded-xl object-cover" /> : <div className="w-14 h-14 rounded-xl bg-navy-100 flex items-center justify-center text-lg font-bold">{name.charAt(0)}</div>}
+        <img src={personPhoto(photo, type)} alt="" onError={(e) => onPersonImgError(e, type)} className="w-14 h-14 rounded-xl object-cover" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="text-lg font-bold text-navy-900">{name}</p>

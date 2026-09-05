@@ -6,6 +6,7 @@ import {
 import type { AppUser } from '@/lib/types';
 import { LoadingState, EmptyState, Badge, formatINR } from '@/components/ui';
 import { Users, FolderKanban, Wallet } from 'lucide-react';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 interface ClientSummary {
   user: AppUser;
@@ -91,7 +92,7 @@ export default function PortalClientsPage() {
         <div className="space-y-4">
           {clients.map((c) => (
             <div key={c.user.id} className="card p-5 flex items-start gap-4 flex-wrap">
-              <img src={c.user.avatar_url ?? `https://ui-avatars.com/api/?name=${c.user.name}`} alt="" className="w-12 h-12 rounded-xl object-cover" />
+              <img src={personPhoto(c.user.avatar_url, c.user.role)} alt="" onError={(e) => onPersonImgError(e, c.user.role)} className="w-12 h-12 rounded-xl object-cover" />
               <div className="flex-1 min-w-[180px]">
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="font-semibold text-navy-900">{c.user.name}</p>

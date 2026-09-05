@@ -3,6 +3,7 @@ import { useAuth } from '@/lib/auth';
 import { roleLabel, type ProfessionalRole } from '@/lib/portal';
 import { PORTAL_TABS } from './portalTabs';
 import { HardHat, LogOut } from 'lucide-react';
+import { onPersonImgError } from '@/lib/people';
 
 export default function PortalLayout({ role }: { role: ProfessionalRole }) {
   const { user, logout } = useAuth();
@@ -30,7 +31,7 @@ export default function PortalLayout({ role }: { role: ProfessionalRole }) {
               </div>
             </div>
             <div className="flex items-center gap-2 shrink-0">
-              {user?.avatar_url && <img src={user.avatar_url} alt="" className="w-7 h-7 rounded-full object-cover" />}
+              {user?.avatar_url && <img src={user.avatar_url} alt="" onError={(e) => onPersonImgError(e, user?.role)} className="w-7 h-7 rounded-full object-cover" />}
               <span className="hidden md:block text-sm font-semibold text-navy-900 truncate max-w-[140px]">{user?.name}</span>
               <button onClick={handleLogout} title="Sign out" className="p-1.5 rounded-lg hover:bg-navy-50 text-navy-400 hover:text-navy-700 transition-colors">
                 <LogOut className="w-4 h-4" />

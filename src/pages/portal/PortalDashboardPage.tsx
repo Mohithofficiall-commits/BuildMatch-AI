@@ -14,6 +14,7 @@ import {
   ClipboardList, FolderKanban, Wallet, Package, ShieldCheck, CreditCard, ShoppingCart,
   CheckCircle2, ArrowRight, Star,
 } from 'lucide-react';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 export default function PortalDashboardPage() {
   const { user } = useAuth();
@@ -74,7 +75,7 @@ export default function PortalDashboardPage() {
       <div className="card p-6 bg-gradient-to-br from-navy-900 to-navy-800 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-navy [background-size:32px_32px] opacity-10" />
         <div className="relative flex items-start gap-4 flex-wrap">
-          <img src={profile ? profilePhoto(profile) : `https://ui-avatars.com/api/?name=${user.name}`} alt="" className="w-16 h-16 rounded-2xl object-cover" />
+          <img src={profile ? profilePhoto(profile) : personPhoto(user.avatar_url, user.role)} alt="" onError={(e) => onPersonImgError(e, profile && 'profession' in profile ? profile.profession : user.role)} className="w-16 h-16 rounded-2xl object-cover" />
           <div className="flex-1 min-w-[220px]">
             <div className="flex items-center gap-2 flex-wrap">
               <h1 className="text-2xl font-bold">{profile ? profileName(profile) : user.name}</h1>

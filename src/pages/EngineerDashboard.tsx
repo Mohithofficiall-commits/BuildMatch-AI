@@ -4,6 +4,7 @@ import { fetchEngineer, fetchProjects, fetchMilestones, fetchPayments, fetchRevi
 import type { Engineer, Project, Milestone, Payment, Review } from '@/lib/types';
 import { LoadingState, Badge, VerifiedBadge, RatingStars, formatINR, formatDate, MilestoneIcon } from '@/components/ui';
 import { ShieldCheck, FolderKanban, Wallet, Star, MessageSquare, Camera, CheckCircle2, TrendingUp } from 'lucide-react';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 export default function EngineerDashboard() {
   const [engineer, setEngineer] = useState<Engineer | null>(null);
@@ -42,7 +43,7 @@ export default function EngineerDashboard() {
       <div className="card p-6 bg-gradient-to-br from-navy-900 to-navy-800 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-grid-navy [background-size:32px_32px] opacity-10" />
         <div className="relative flex items-start gap-4 flex-wrap">
-          <img src={engineer.photo_url} alt={engineer.name} className="w-16 h-16 rounded-2xl object-cover" />
+          <img src={personPhoto(engineer.photo_url, 'engineer')} alt={engineer.name} onError={(e) => onPersonImgError(e, 'engineer')} className="w-16 h-16 rounded-2xl object-cover" />
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h1 className="text-2xl font-bold">{engineer.name}</h1>

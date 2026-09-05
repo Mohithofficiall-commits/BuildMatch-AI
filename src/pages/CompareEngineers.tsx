@@ -5,6 +5,7 @@ import { useCompare } from '@/lib/compare';
 import type { Engineer, ProjectRequirement } from '@/lib/types';
 import { Badge, LoadingState, EmptyState, formatINR } from '@/components/ui';
 import { GitCompareArrows, X, Trophy } from 'lucide-react';
+import { personPhoto, onPersonImgError } from '@/lib/people';
 
 export default function CompareEngineers() {
   const navigate = useNavigate();
@@ -98,7 +99,7 @@ export default function CompareEngineers() {
                 {engineers.map((e) => (
                   <th key={e.id} className="p-4 text-left min-w-[200px]">
                     <div className="flex items-center gap-2">
-                      <img src={e.photo_url} alt={e.name} className="w-10 h-10 rounded-lg object-cover" />
+                      <img src={personPhoto(e.photo_url, 'engineer')} alt={e.name} onError={(e) => onPersonImgError(e, 'engineer')} className="w-10 h-10 rounded-lg object-cover" />
                       <div>
                         <div className="flex items-center gap-1">
                           <p className="font-semibold text-navy-900 text-sm">{e.name}</p>

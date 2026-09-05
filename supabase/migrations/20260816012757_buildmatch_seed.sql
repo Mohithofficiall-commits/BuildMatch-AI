@@ -24,7 +24,7 @@ INSERT INTO engineers (id, user_id, name, email, phone, photo_url, location, exp
     'Er. S. Karthik',
     'karthik@buildmatch.ai',
     '+91 98422 12345',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop',
+    '/people/engineer-1.jpg',
     'Coimbatore',
     12, 48, 4.8, 32,
     ARRAY['Residential','Villa','Modern','2BHK','3BHK'],
@@ -37,7 +37,7 @@ INSERT INTO engineers (id, user_id, name, email, phone, photo_url, location, exp
   (
     'e2000000-0000-0000-0000-000000000002', NULL,
     'Er. Priya Menon', 'priya@buildmatch.ai', '+91 98400 56789',
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop',
+    '/people/engineer-2.jpg',
     'Bengaluru', 10, 41, 4.7, 28,
     ARRAY['Residential','Apartment','Contemporary','Eco-friendly'],
     1750, 1400000, 3200000, 'B.E. Civil, M.Tech Construction Management',
@@ -48,7 +48,7 @@ INSERT INTO engineers (id, user_id, name, email, phone, photo_url, location, exp
   (
     'e2000000-0000-0000-0000-000000000003', NULL,
     'Er. Arjun Reddy', 'arjun@buildmatch.ai', '+91 99491 22334',
-    'https://images.unsplash.com/photo-1500648766831-d4ce8b6f1f22?w=400&h=400&fit=crop',
+    '/people/engineer-3.jpg',
     'Hyderabad', 15, 62, 4.9, 45,
     ARRAY['Residential','Villa','Luxury','G+3','Commercial'],
     2100, 2500000, 6000000, 'M.E. Structural, Osmania University',
@@ -59,7 +59,7 @@ INSERT INTO engineers (id, user_id, name, email, phone, photo_url, location, exp
   (
     'e2000000-0000-0000-0000-000000000004', NULL,
     'Er. Ananya Iyer', 'ananya@buildmatch.ai', '+91 98479 88556',
-    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
+    '/people/engineer-4.jpg',
     'Chennai', 8, 35, 4.6, 24,
     ARRAY['Residential','Apartment','Traditional','2BHK'],
     1650, 1200000, 2800000, 'B.Arch, Anna University',
@@ -70,7 +70,7 @@ INSERT INTO engineers (id, user_id, name, email, phone, photo_url, location, exp
   (
     'e2000000-0000-0000-0000-000000000005', NULL,
     'Er. Vikram Nair', 'vikram@buildmatch.ai', '+91 98950 11223',
-    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4f?w=400&h=400&fit=crop',
+    '/people/engineer-5.jpg',
     'Kochi', 14, 52, 4.8, 38,
     ARRAY['Residential','Villa','Waterfront','Modern'],
     1950, 1800000, 4500000, 'M.Tech Civil, IIT Madras',
@@ -81,7 +81,7 @@ INSERT INTO engineers (id, user_id, name, email, phone, photo_url, location, exp
   (
     'e2000000-0000-0000-0000-000000000006', NULL,
     'Er. Rohit Deshmukh', 'rohit@buildmatch.ai', '+91 99230 44556',
-    'https://images.unsplash.com/photo-1633332755192-727a78c9705d?w=400&h=400&fit=crop',
+    '/people/engineer-7.jpg',
     'Pune', 9, 38, 4.5, 22,
     ARRAY['Residential','Apartment','Modern','Budget'],
     1550, 1000000, 2500000, 'B.E. Civil, Pune University',
@@ -92,7 +92,7 @@ INSERT INTO engineers (id, user_id, name, email, phone, photo_url, location, exp
   (
     'e2000000-0000-0000-0000-000000000007', NULL,
     'Er. Kavya Krishnan', 'kavya@buildmatch.ai', '+91 98475 66778',
-    'https://images.unsplash.com/photo-1534528741775-3b2b1f3a8b76?w=400&h=400&fit=crop',
+    '/people/engineer-6.jpg',
     'Coimbatore', 7, 29, 4.7, 19,
     ARRAY['Residential','2BHK','Modern','Sustainable'],
     1700, 1300000, 3000000, 'M.E. Structural, PSG Tech',
@@ -103,7 +103,7 @@ INSERT INTO engineers (id, user_id, name, email, phone, photo_url, location, exp
   (
     'e2000000-0000-0000-0000-000000000008', NULL,
     'Er. Sanjay Gupta', 'sanjay@buildmatch.ai', '+91 99100 77889',
-    'https://images.unsplash.com/photo-1545167622-3a6ac756afa4?w=400&h=400&fit=crop',
+    '/people/engineer-8.jpg',
     'Mumbai', 18, 75, 4.9, 56,
     ARRAY['Residential','Luxury','Villa','High-rise','Commercial'],
     2300, 3000000, 8000000, 'M.E. Structural, IIT Bombay',
