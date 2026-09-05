@@ -19,7 +19,7 @@ import Reviews from '@/pages/Reviews';
 import Complaints from '@/pages/Complaints';
 import DigitalPassport from '@/pages/DigitalPassport';
 import AdminDashboard from '@/pages/AdminDashboard';
-import EngineerDashboard from '@/pages/EngineerDashboard';
+import EngineerHomePage from '@/pages/portal/EngineerHomePage';
 // Professional portal pages (engineer / plumber / electrician / material shop)
 import PortalDashboardPage from '@/pages/portal/PortalDashboardPage';
 import PortalRequestsPage from '@/pages/portal/PortalRequestsPage';
@@ -79,9 +79,9 @@ function AppRoutes() {
         <Route path="digital-passport" element={<DigitalPassport />} />
       </Route>
 
-      {/* Engineer portal (existing dashboard preserved as the index route) */}
+      {/* Engineer portal — professional network home as the index route */}
       <Route path="/app/engineer/*" element={<ProtectedRoute roles={['engineer']}><PortalLayout role="engineer" /></ProtectedRoute>}>
-        <Route index element={<EngineerDashboard />} />
+        <Route index element={<EngineerHomePage />} />
         {portalChildren(false, false)}
       </Route>
 

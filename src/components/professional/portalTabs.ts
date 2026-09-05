@@ -1,5 +1,5 @@
 import {
-  LayoutDashboard, ClipboardList, FolderKanban, Users, Wallet,
+  LayoutDashboard, Home as HomeIcon, ClipboardList, FolderKanban, Users, Wallet,
   ShieldCheck, CreditCard, MessageSquare, Package, ShoppingCart,
 } from 'lucide-react';
 import type { ProfessionalRole } from '@/lib/portal';
@@ -13,7 +13,7 @@ export interface PortalTab {
 
 export const PORTAL_TABS: Record<ProfessionalRole, PortalTab[]> = {
   engineer: [
-    { to: '/app/engineer', end: true, label: 'Dashboard', icon: LayoutDashboard },
+    { to: '/app/engineer', end: true, label: 'Home', icon: HomeIcon },
     { to: '/app/engineer/requests', label: 'Project Requests', icon: ClipboardList },
     { to: '/app/engineer/projects', label: 'My Projects', icon: FolderKanban },
     { to: '/app/engineer/clients', label: 'Clients', icon: Users },

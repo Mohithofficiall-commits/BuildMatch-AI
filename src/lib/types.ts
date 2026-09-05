@@ -393,3 +393,37 @@ export interface VerificationRequestJoined extends VerificationRequest {
 export interface CertificateJoined extends Certificate {
   verification_request?: { status: VerificationRequest['status']; submitted_at: string } | null;
 }
+
+// ============================================================
+// Professional Network Feed (LinkedIn-style activity feed)
+// ============================================================
+
+export type FeedCategory = 'project_update' | 'discussion' | 'tip' | 'achievement' | 'opportunity' | 'news';
+
+export interface FeedPost {
+  id: string;
+  author_user_id: string;
+  author_name: string;
+  author_role: string;
+  author_title?: string | null;
+  author_photo_url?: string | null;
+  author_verified: boolean;
+  category: FeedCategory;
+  content: string;
+  image_url?: string | null;
+  likes_count: number;
+  comments_count: number;
+  liked_by_me?: boolean;
+  created_at: string;
+}
+
+export interface FeedComment {
+  id: string;
+  post_id: string;
+  author_user_id: string;
+  author_name: string;
+  author_role: string;
+  author_photo_url?: string | null;
+  content: string;
+  created_at: string;
+}
