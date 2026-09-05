@@ -1,40 +1,23 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  MapPin, CalendarRange, FolderKanban, Star, ShieldCheck, Award, Building2, Compass, Flame,
-} from 'lucide-react';
+import { Search, MapPin, CalendarRange, FolderKanban, Star, ShieldCheck, Award, Building2, Compass, Flame, Bookmark } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { useProfessionalProfile } from '@/lib/portal';
-import { fetchEngineers, fetchProfessionalProfiles } from '@/lib/data';
-import type { Engineer, ProfessionalProfile, FeedPost, FeedComment, FeedCategory, AppUser } from '@/lib/types';
+import { fetchEngineers, fetchProfessionalProfiles, fetchProjects } from '@/lib/data';
+import type { Engineer, ProfessionalProfile, FeedPost, FeedComment, FeedCategory, AppUser, PostVisibility } from '@/lib/types';
 import {
-  fetchFeed, fetchComments, createFeedPost, addFeedComment, toggleFeedLike, FEED_CATEGORIES,
+  fetchFeed, fetchComments, publishPost, addFeedComment, toggleFeedLike, repostPost,
+  updateFeedPost, deleteFeedPost, toggleFeedSave, fetchSavedPostIds, deleteFeedComment,
+  FEED_CATEGORIES,
 } from '@/lib/feed';
+import type { ComposerSubmit, MentionTarget } from '@/components/feed/PostComposer';
 import { personPhoto, onPersonImgError } from '@/lib/people';
 import { Badge, VerifiedBadge, RatingStars, ProgressBar } from '@/components/ui';
 import PostComposer from '@/components/feed/PostComposer';
 import FeedPostCard from '@/components/feed/FeedPostCard';
 
-interface RailEngineer {
-  id: string;
-  name: string;
-  photo: string;
-  headline: string;
-  location: string;
-  rating: number;
-  verified: boolean;
-}
-
-interface RailPro {
-  id: string;
-  name: string;
-  business: string | null;
-  profession: string;
-  photo: string;
-  location: string;
-  rating: number;
-  verified: boolean;
-}
+interface RailEngineer { id: string; name: string; photo: string; headline: string; location: string; rating: number; verified: boolean; }
+interface RailPro { id: string; name: string; business: string | null; profession: string; photo: string; location: string; rating: number; verified: boolean; }
 
 const TRENDING = [
   { label: 'Sustainable Construction', posts: 128 },
@@ -45,213 +28,255 @@ const TRENDING = [
   { label: 'Green Architecture', posts: 41 },
 ];
 
+type FeedView = 'all' | 'mine' | 'saved';
+
+const SAVED_LS_KEY = 'bm_saved_posts';
+
 export default function EngineerHomePage() {
   const { user } = useAuth();
-  const { profile, loading } = useProfessionalProfile('engineer');
+  const { profile } = useProfessionalProfile('engineer');
   const navigate = useNavigate();
 
   const [posts, setPosts] = useState<FeedPost[]>([]);
   const [demo, setDemo] = useState(false);
-  const [filter, setFilter] = useState<FeedCategory | 'all'>('all');
+  const [feedReady, setFeedReady] = useState(false);
+  const [category, setCategory] = useState<FeedCategory | 'all'>('all');
+  const [view, setView] = useState<FeedView>('all');
+  const [query, setQuery] = useState('');
+  const [savedIds, setSavedIds] = useState<Set<string>>(new Set());
   const [comments, setComments] = useState<Record<string, FeedComment[]>>({});
   const [commentsLoaded, setCommentsLoaded] = useState<Set<string>>(new Set());
   const [commentsLoadingId, setCommentsLoadingId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const [engineers, setEngineers] = useState<RailEngineer[]>([]);
   const [pros, setPros] = useState<RailPro[]>([]);
+  const [mentionTargets, setMentionTargets] = useState<MentionTarget[]>([]);
+  const [projectOptions, setProjectOptions] = useState<{ id: string; title: string }[]>([]);
 
   const eng = (profile as Engineer | null) ?? null;
 
-  // Load feed + discovery rails once
+  // ---- load feed, directory + my projects (once the engineer row is known) ----
   useEffect(() => {
     (async () => {
       try {
-        const [feedRes, engs, profs] = await Promise.all([
-          fetchFeed(50),
+        const fetchPros = (): Promise<ProfessionalProfile[]> => fetchProfessionalProfiles().catch(() => []);
+        const [feedRes, engs, profs, projects] = await Promise.all([
+          fetchFeed(60),
           fetchEngineers().catch(() => [] as Engineer[]),
-          fetchProfessionalProfiles().catch(() => [] as ProfessionalProfile[]),
+          fetchPros(),
+          fetchProjects().catch(() => []),
         ]);
         setPosts(feedRes.posts);
         setDemo(feedRes.demo);
 
-        const engList = engs
-          .filter((e) => !eng || e.id !== eng.id)
-          .map((e) => ({
-            id: e.id,
-            name: e.name,
-            photo: personPhoto(e.photo_url, 'engineer'),
-            headline: e.qualification || 'Civil Engineer',
-            location: e.location,
-            rating: e.rating,
-            verified: e.verification_status === 'verified',
-          }));
-        setEngineers(engList.slice(0, 4));
+        const eRows = engs.filter((e) => !eng || e.id !== eng.id);
+        setEngineers(eRows.slice(0, 4).map((e) => ({
+          id: e.id, name: e.name, photo: personPhoto(e.photo_url, 'engineer'),
+          headline: e.qualification || 'Civil Engineer', location: e.location, rating: e.rating,
+          verified: e.verification_status === 'verified',
+        })));
+        setMentionTargets(eRows.slice(0, 10).map((e) => ({
+          id: e.user_id ?? e.id, name: e.name, role: 'engineer', title: e.qualification,
+          photo: personPhoto(e.photo_url, 'engineer'), verified: e.verification_status === 'verified',
+        })));
 
-        const proList = profs.map((p) => ({
-          id: p.id,
-          name: p.name,
-          business: p.business_name ?? null,
-          profession: p.profession,
-          photo: personPhoto(p.photo_url, p.profession),
-          location: p.location,
-          rating: p.rating,
+        const pRows = profs;
+        setPros(pRows.slice(0, 4).map((p) => ({
+          id: p.id, name: p.name, business: p.business_name ?? null, profession: p.profession,
+          photo: personPhoto(p.photo_url, p.profession), location: p.location, rating: p.rating,
           verified: p.verification_status === 'verified',
-        }));
-        setPros(proList.slice(0, 4));
-      } catch {
-        /* non-fatal */
-      }
+        })));
+        setMentionTargets((prev) => [...prev, ...pRows.slice(0, 6).map((p) => ({
+          id: p.user_id, name: p.name, role: p.profession, title: p.business_name,
+          photo: personPhoto(p.photo_url, p.profession), verified: p.verification_status === 'verified',
+        }))]);
+
+        if (eng) {
+          const mine = projects.filter((p) => p.engineer_id === eng.id || p.homeowner_id === user?.id);
+          setProjectOptions(mine.map((p) => ({ id: p.id, title: p.title })));
+        }
+      } catch { /* non-fatal */ } finally { setFeedReady(true); }
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [eng]);
 
-  // ---------------- Feed interactions ----------------
+  // ---- saved posts ----
+  useEffect(() => {
+    if (!user) return;
+    if (demo) {
+      try {
+        const stored = JSON.parse(localStorage.getItem(SAVED_LS_KEY) ?? '[]') as string[];
+        setSavedIds(new Set(stored));
+      } catch { setSavedIds(new Set()); }
+      return;
+    }
+    void fetchSavedPostIds(user.id).then((ids) => setSavedIds(ids));
+  }, [user, demo]);
 
+  useEffect(() => {
+    setPosts((prev) => prev.map((p) => ({ ...p, saved_by_me: savedIds.has(p.id) })));
+  }, [savedIds]);
+
+  useEffect(() => {
+    if (!demo || !user) return;
+    try { localStorage.setItem(SAVED_LS_KEY, JSON.stringify([...savedIds])); } catch { /* ignore */ }
+  }, [demo, savedIds, user]);
+
+  // ---- helpers ----
   const bumpPost = useCallback((id: string, patch: Partial<FeedPost>) => {
     setPosts((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
   }, []);
 
-  const handleToggleLike = useCallback(
-    async (post: FeedPost) => {
-      const nextLiked = !post.liked_by_me;
-      const delta = nextLiked ? 1 : -1;
-      // optimistic
-      bumpPost(post.id, { liked_by_me: nextLiked, likes_count: Math.max(0, post.likes_count + delta) });
-      if (demo || !user) return; // demo session keeps state locally
+  const showError = useCallback((msg: string) => setNotice(msg), []);
+
+  const authorMeta = useCallback(() => ({
+    title: composeHeadline(user, eng),
+    verified: eng?.verification_status === 'verified',
+  }), [user, eng]);
+
+  // ---- interactions ----
+  const handlePublish = useCallback(async (input: ComposerSubmit) => {
+    if (!user) return;
+    setBusy(true);
+    setNotice(null);
+    const { post, demo: d } = await publishPost(user, authorMeta(), input);
+    setPosts((prev) => [post, ...prev]);
+    if (d) setNotice('Published for this session — connect the database migration for live posting.');
+    setBusy(false);
+  }, [user, authorMeta]);
+
+  const handleToggleLike = useCallback(async (post: FeedPost) => {
+    if (!user) return;
+    const nextLiked = !post.liked_by_me;
+    bumpPost(post.id, { liked_by_me: nextLiked, likes_count: Math.max(0, post.likes_count + (nextLiked ? 1 : -1)) });
+    if (demo) return;
+    try {
+      await toggleFeedLike(post, user.id, user.name);
+    } catch {
+      bumpPost(post.id, { liked_by_me: post.liked_by_me, likes_count: post.likes_count });
+      showError('Could not update the like — try again.');
+    }
+  }, [bumpPost, demo, showError, user]);
+
+  const loadComments = useCallback(async (postId: string) => {
+    setCommentsLoadingId(postId);
+    try {
+      const list = await fetchComments(postId);
+      setComments((prev) => ({ ...prev, [postId]: list }));
+      setCommentsLoaded((prev) => new Set(prev).add(postId));
+    } finally { setCommentsLoadingId(null); }
+  }, []);
+
+  const handleAddComment = useCallback(async (postId: string, content: string, parentId: string | null) => {
+    if (!user) return;
+    const tmp: FeedComment = {
+      id: `local-${Date.now()}`, post_id: postId, author_user_id: user.id, author_name: user.name,
+      author_role: user.role, author_photo_url: personPhoto(user.avatar_url, user.role),
+      parent_id: parentId, content, created_at: new Date().toISOString(),
+    };
+    setComments((prev) => ({ ...prev, [postId]: [...(prev[postId] ?? []), tmp] }));
+    bumpPost(postId, { comments_count: (posts.find((p) => p.id === postId)?.comments_count ?? 0) + 1 });
+    if (demo) return;
+    const author = posts.find((p) => p.id === postId);
+    const saved = await addFeedComment(postId, author?.author_user_id ?? '', user.id, user.name, {
+      author_user_id: user.id, author_name: user.name, author_role: user.role,
+      author_photo_url: tmp.author_photo_url, content, parent_id: parentId,
+    });
+    if (saved) {
+      setComments((prev) => ({ ...prev, [postId]: [...(prev[postId] ?? []).filter((c) => c.id !== tmp.id), saved] }));
+    }
+  }, [bumpPost, demo, posts, user]);
+
+  const handleDeleteComment = useCallback((commentId: string) => {
+    setComments((prev) => {
+      const next: Record<string, FeedComment[]> = {};
+      for (const [k, list] of Object.entries(prev)) next[k] = list.filter((c) => c.id !== commentId);
+      return next;
+    });
+    if (!demo) void deleteFeedComment(commentId).catch(() => undefined);
+  }, [demo]);
+
+  const handleSave = useCallback((post: FeedPost) => {
+    if (!user) return;
+    const nowSaved = !post.saved_by_me;
+    setSavedIds((prev) => {
+      const next = new Set(prev);
+      if (nowSaved) next.add(post.id); else next.delete(post.id);
+      return next;
+    });
+    if (!demo) void toggleFeedSave(post.id, user.id, post.saved_by_me === true).catch(() => showError('Could not save post.'));
+  }, [demo, showError, user]);
+
+  const handleRepost = useCallback(async (post: FeedPost, caption: string) => {
+    if (!user) return;
+    setBusy(true);
+    const { post: repost, demo: d } = await repostPost(user, authorMeta(), post, caption);
+    setPosts((prev) => [repost, ...prev]);
+    if (d) setNotice('Repost added for this session.');
+    setBusy(false);
+  }, [authorMeta, user]);
+
+  const handleEdit = useCallback(async (postId: string, content: string, location: string | null, visibility: string) => {
+    const vis = (visibility || 'public') as PostVisibility;
+    bumpPost(postId, { content, location, visibility: vis, edited_at: new Date().toISOString() });
+    if (!demo) {
       try {
-        await toggleFeedLike(post.id, user.id, Boolean(post.liked_by_me));
-      } catch {
-        bumpPost(post.id, { liked_by_me: post.liked_by_me, likes_count: post.likes_count });
-        setErrorMsg('Could not update like — try again.');
-      }
-    },
-    [bumpPost, demo, user],
-  );
+        await updateFeedPost(postId, { content, location, visibility: vis });
+      } catch { showError('Edit saved locally only — database update failed.'); }
+    }
+  }, [bumpPost, demo, showError]);
 
-  const loadComments = useCallback(
-    async (postId: string) => {
-      setCommentsLoadingId(postId);
-      try {
-        const list = await fetchComments(postId);
-        setComments((prev) => ({ ...prev, [postId]: list }));
-        setCommentsLoaded((prev) => new Set(prev).add(postId));
-      } catch {
-        /* ignore */
-      } finally {
-        setCommentsLoadingId(null);
-      }
-    },
-    [],
-  );
+  const handleDelete = useCallback((postId: string) => {
+    setPosts((prev) => prev.filter((p) => p.id !== postId));
+    setSavedIds((prev) => { const n = new Set(prev); n.delete(postId); return n; });
+    if (!demo) void deleteFeedPost(postId).catch(() => showError('Could not delete the post.'));
+  }, [demo, showError]);
 
-  const handleAddComment = useCallback(
-    async (postId: string, content: string) => {
-      if (!user) return;
-      const comment: FeedComment = {
-        id: `local-${Date.now()}`,
-        post_id: postId,
-        author_user_id: user.id,
-        author_name: user.name,
-        author_role: user.role,
-        author_photo_url: personPhoto(user.avatar_url, user.role),
-        content,
-        created_at: new Date().toISOString(),
-      };
-      setComments((prev) => ({ ...prev, [postId]: [...(prev[postId] ?? []), comment] }));
-      bumpPost(postId, { comments_count: (posts.find((p) => p.id === postId)?.comments_count ?? 0) + 1 });
-      if (demo) return;
-      try {
-        const saved = await addFeedComment(postId, {
-          author_user_id: user.id,
-          author_name: user.name,
-          author_role: user.role,
-          author_photo_url: comment.author_photo_url,
-          content,
-        });
-        setComments((prev) => ({ ...prev, [postId]: [...(prev[postId] ?? []).filter((c) => c.id !== comment.id), saved] }));
-      } catch {
-        setErrorMsg('Comment saved locally only — database write failed.');
+  // ---- derived views ----
+  const originals = useMemo(() => {
+    const map: Record<string, FeedPost> = {};
+    for (const p of posts) {
+      if (p.repost_of && !map[p.repost_of]) {
+        const orig = posts.find((x) => x.id === p.repost_of);
+        if (orig) map[p.repost_of] = orig;
       }
-    },
-    [bumpPost, demo, posts, user],
-  );
+    }
+    return map;
+  }, [posts]);
 
-  const handleCreatePost = useCallback(
-    async (category: FeedCategory, content: string) => {
-      if (!user) return;
-      setBusy(true);
-      setErrorMsg(null);
-      const post: FeedPost = {
-        id: `local-${Date.now()}`,
-        author_user_id: user.id,
-        author_name: user.name,
-        author_role: user.role,
-        author_title: composeHeadline(user, eng),
-        author_photo_url: personPhoto(user.avatar_url, user.role),
-        author_verified: eng?.verification_status === 'verified',
-        category,
-        content,
-        image_url: null,
-        likes_count: 0,
-        comments_count: 0,
-        liked_by_me: false,
-        created_at: new Date().toISOString(),
-      };
-      setPosts((prev) => [post, ...prev]);
-      if (demo) {
-        setBusy(false);
-        return;
-      }
-      try {
-        const saved = await createFeedPost({
-          author_user_id: user.id,
-          author_name: user.name,
-          author_role: user.role,
-          author_title: post.author_title ?? undefined,
-          author_photo_url: post.author_photo_url ?? undefined,
-          author_verified: post.author_verified,
-          category,
-          content,
-        });
-        setPosts((prev) => prev.map((p) => (p.id === post.id ? saved : p)));
-      } catch {
-        setErrorMsg('Post published for this session — connect the database migration for live publishing.');
-      } finally {
-        setBusy(false);
-      }
-    },
-    [demo, eng, user],
-  );
-
-  const visiblePosts = useMemo(
-    () => (filter === 'all' ? posts : posts.filter((p) => p.category === filter)),
-    [filter, posts],
-  );
-
-  // ---------------- Render ----------------
+  const visiblePosts = useMemo(() => {
+    let list = posts;
+    if (view === 'mine' && user) list = list.filter((p) => p.author_user_id === user.id);
+    if (view === 'saved') list = list.filter((p) => p.saved_by_me);
+    if (category !== 'all') list = list.filter((p) => p.category === category);
+    const q = query.trim();
+    if (q) {
+      const lower = q.toLowerCase();
+      const hashtag = q.startsWith('#') ? q.slice(1).toLowerCase() : null;
+      list = list.filter((p) => {
+        if (hashtag) return (p.hashtags ?? []).some((h) => h.toLowerCase() === hashtag) || p.content.toLowerCase().includes(hashtag);
+        return p.content.toLowerCase().includes(lower) || p.author_name.toLowerCase().includes(lower) || (p.hashtags ?? []).some((h) => h.toLowerCase().includes(lower));
+      });
+    }
+    return list;
+  }, [category, posts, query, user, view]);
 
   const profileStrength = useMemo(() => {
     if (!eng) return 0;
-    let filled = 0;
-    const checks = [
-      Boolean(eng.bio),
-      Boolean(eng.qualification),
-      eng.specializations.length > 0,
-      eng.projects_completed > 0,
-      Boolean(eng.photo_url),
-      eng.rating > 0,
-    ];
-    filled = checks.filter(Boolean).length;
-    return Math.round((filled / checks.length) * 100);
+    const checks = [Boolean(eng.bio), Boolean(eng.qualification), eng.specializations.length > 0, eng.projects_completed > 0, Boolean(eng.photo_url), eng.rating > 0];
+    return Math.round((checks.filter(Boolean).length / checks.length) * 100);
   }, [eng]);
+
+  const demoBanner = demo;
 
   return (
     <div className="px-4 lg:px-6 py-6 space-y-6">
-      {errorMsg && (
+      {notice && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] font-medium text-amber-800 flex items-center justify-between gap-3">
-          <span>{errorMsg}</span>
-          <button onClick={() => setErrorMsg(null)} className="text-amber-600 hover:text-amber-900 text-sm font-bold shrink-0">✕</button>
+          <span>{notice}</span>
+          <button onClick={() => setNotice(null)} className="text-amber-600 hover:text-amber-900 text-sm font-bold shrink-0">✕</button>
         </div>
       )}
 
@@ -277,21 +302,14 @@ export default function EngineerHomePage() {
               <div className="flex items-center gap-3 text-[13px] text-navy-500 mt-1 flex-wrap">
                 <span className="inline-flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {eng?.location ?? user?.location ?? '—'}</span>
                 <span className="inline-flex items-center gap-1"><CalendarRange className="w-3.5 h-3.5" /> {eng?.experience_years ?? 0}+ years experience</span>
-                {eng?.availability && (
-                  <Badge variant={eng.availability === 'Available' ? 'success' : 'navy'}>{eng.availability}</Badge>
-                )}
+                {eng?.availability && <Badge variant={eng.availability === 'Available' ? 'success' : 'navy'}>{eng.availability}</Badge>}
               </div>
             </div>
             <div className="flex gap-2 pt-9">
-              {eng && (
-                <Link to={`/app/engineers/${eng.id}`} className="btn-primary text-sm px-4 py-2">
-                  <Award className="w-4 h-4" /> View public profile
-                </Link>
-              )}
+              {eng && <Link to={`/app/engineers/${eng.id}`} className="btn-primary text-sm px-4 py-2"><Award className="w-4 h-4" /> View public profile</Link>}
             </div>
           </div>
 
-          {/* Real stat chips */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-5">
             {[
               { icon: FolderKanban, label: 'Projects completed', value: String(eng?.projects_completed ?? 0), tint: 'bg-royal-50 text-royal-700' },
@@ -319,34 +337,43 @@ export default function EngineerHomePage() {
         </div>
       </div>
 
-      {/* Feed + right rail */}
       <div className="xl:flex xl:items-start xl:gap-6">
-        <div className="xl:flex-1 min-w-0 max-w-[720px] xl:max-w-none mx-auto w-full space-y-5">
-          {demo && (
+        <div className="xl:flex-1 min-w-0 max-w-[720px] xl:max-w-none mx-auto w-full space-y-4">
+          {demoBanner && (
             <div className="rounded-xl border border-royal-200 bg-royal-50/70 px-4 py-2.5 text-[12.5px] font-medium text-royal-800">
-              <strong>Preview feed.</strong> The network_feed migration isn&apos;t applied to this Supabase project yet — showing clearly-labelled demo network activity. Apply the migration for live posting.
+              <strong>Preview feed.</strong> The social_posts migration isn&apos;t applied yet — showing labelled demo activity with full compose preview. Apply the migration for live posting, media uploads and notifications.
             </div>
           )}
 
-          {user && (
-            <PostComposer
-              user={user}
-              demo={demo}
-              busy={busy}
-              onSubmit={handleCreatePost}
-            />
-          )}
+          {/* Search + view row */}
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="relative flex-1 min-w-[200px]">
+              <Search className="w-4 h-4 text-navy-300 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search posts, engineers, #hashtags…"
+                className="input pl-9 pr-8 py-2 text-[13px]"
+              />
+              {query && <button onClick={() => setQuery('')} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-navy-300 hover:text-navy-600 text-sm">✕</button>}
+            </div>
+            <div className="flex items-center gap-1.5 bg-white rounded-xl border border-navy-100 p-1">
+              {([['all', 'All'], ['mine', 'My Posts'], ['saved', 'Saved']] as [FeedView, string][]).map(([v, label]) => (
+                <button key={v} onClick={() => setView(v)} className={`px-3 py-1.5 rounded-lg text-[12.5px] font-semibold transition-all ${view === v ? 'bg-navy-900 text-white' : 'text-navy-500 hover:text-navy-800'}`}>
+                  {v === 'saved' && <Bookmark className="w-3 h-3 inline mr-1" />}{label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-          {/* Category filter */}
+          {/* Category chips */}
           <div className="flex gap-1.5 overflow-x-auto no-scrollbar pb-1">
             {FEED_CATEGORIES.map((c) => (
               <button
                 key={c.value}
-                onClick={() => setFilter(c.value)}
+                onClick={() => setCategory(c.value)}
                 className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-semibold whitespace-nowrap border transition-all ${
-                  filter === c.value
-                    ? 'bg-navy-900 text-white border-navy-900 shadow-soft'
-                    : 'bg-white text-navy-600 border-navy-200 hover:border-navy-400'
+                  category === c.value ? 'bg-navy-900 text-white border-navy-900 shadow-soft' : 'bg-white text-navy-600 border-navy-200 hover:border-navy-400'
                 }`}
               >
                 {c.label}
@@ -354,12 +381,23 @@ export default function EngineerHomePage() {
             ))}
           </div>
 
-          {loading && <p className="text-sm muted px-1">Loading feed…</p>}
-          {!loading && visiblePosts.length === 0 && (
+          {user && (
+            <PostComposer
+              user={user}
+              demo={demo}
+              busy={busy}
+              mentionTargets={mentionTargets}
+              projectOptions={projectOptions}
+              onSubmit={handlePublish}
+            />
+          )}
+
+          {!feedReady && <p className="text-sm muted px-1">Loading your network feed…</p>}
+          {feedReady && visiblePosts.length === 0 && (
             <div className="card p-10 text-center">
               <Compass className="w-10 h-10 text-navy-200 mx-auto" />
               <p className="font-semibold text-navy-900 mt-3">Nothing here yet</p>
-              <p className="text-sm muted mt-1">Be the first to share a project update or discussion in this category.</p>
+              <p className="text-sm muted mt-1">{view === 'saved' ? 'Posts you save will appear here.' : 'Be the first to share an update or discussion.'}</p>
             </div>
           )}
 
@@ -367,13 +405,22 @@ export default function EngineerHomePage() {
             <FeedPostCard
               key={post.id}
               post={post}
+              original={post.repost_of ? (originals[post.repost_of] ?? null) : null}
               demo={demo}
+              isMine={Boolean(user && post.author_user_id === user.id)}
+              currentUserId={user?.id}
               comments={comments[post.id] ?? []}
               commentsLoaded={commentsLoaded.has(post.id)}
               commentsLoading={commentsLoadingId === post.id}
               onToggleLike={handleToggleLike}
               onLoadComments={loadComments}
               onAddComment={handleAddComment}
+              onDeleteComment={handleDeleteComment}
+              onSave={handleSave}
+              onRepost={handleRepost}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onTagClick={(t) => setQuery(`#${t}`)}
             />
           ))}
         </div>
@@ -433,17 +480,14 @@ export default function EngineerHomePage() {
             <p className="font-bold text-navy-900 text-[15px] mb-3">Trending in construction</p>
             <div className="space-y-2.5">
               {TRENDING.map((t) => (
-                <div key={t.label} className="flex items-center gap-2.5">
+                <button key={t.label} onClick={() => setQuery(t.label.split(' ')[0])} className="w-full flex items-center gap-2.5 text-left group">
                   <span className="w-1.5 h-1.5 rounded-full bg-royal-500 shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[13px] font-semibold text-navy-800 truncate">{t.label}</p>
-                  </div>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-[13px] font-semibold text-navy-800 truncate group-hover:text-royal-700">{t.label}</span>
+                  </span>
                   <span className="text-[11px] text-navy-400">{t.posts} posts</span>
-                </div>
+                </button>
               ))}
-            </div>
-            <div className="mt-3 pt-3 border-t border-navy-100">
-              <p className="text-[11.5px] text-navy-400 leading-snug">Trend volume reflects professional activity in this demo network.</p>
             </div>
           </div>
         </aside>
@@ -452,7 +496,8 @@ export default function EngineerHomePage() {
   );
 }
 
-function composeHeadline(user: AppUser, eng: Engineer | null): string {
+function composeHeadline(user: AppUser | null, eng: Engineer | null): string {
   if (eng) return `Civil Engineer · ${eng.location}`;
+  if (!user) return '';
   return user.location ? `${user.role} · ${user.location}` : user.role;
 }

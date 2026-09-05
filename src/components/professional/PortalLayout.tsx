@@ -4,6 +4,7 @@ import { roleLabel, type ProfessionalRole } from '@/lib/portal';
 import { PORTAL_TABS } from './portalTabs';
 import { HardHat, LogOut } from 'lucide-react';
 import { onPersonImgError } from '@/lib/people';
+import NotificationsBell from './NotificationsBell';
 
 export default function PortalLayout({ role }: { role: ProfessionalRole }) {
   const { user, logout } = useAuth();
@@ -33,16 +34,17 @@ export default function PortalLayout({ role }: { role: ProfessionalRole }) {
               </NavLink>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-1 shrink-0">
+              {user && <NotificationsBell role={role} />}
               {user?.avatar_url && (
                 <img
                   src={user.avatar_url}
                   alt=""
                   onError={(e) => onPersonImgError(e, user?.role)}
-                  className="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow-soft"
+                  className="w-8 h-8 rounded-full object-cover ring-2 ring-white shadow-soft ml-1"
                 />
               )}
-              <span className="hidden md:block text-sm font-semibold text-navy-900 truncate max-w-[160px]">{user?.name}</span>
+              <span className="hidden md:block text-sm font-semibold text-navy-900 truncate max-w-[140px]">{user?.name}</span>
               <button onClick={handleLogout} title="Sign out" className="p-2 rounded-lg hover:bg-navy-50 text-navy-400 hover:text-navy-700 transition-colors">
                 <LogOut className="w-4 h-4" />
               </button>

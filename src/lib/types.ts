@@ -400,6 +400,22 @@ export interface CertificateJoined extends Certificate {
 
 export type FeedCategory = 'project_update' | 'discussion' | 'tip' | 'achievement' | 'opportunity' | 'news';
 
+export type PostVisibility = 'public' | 'connections' | 'team' | 'homeowner_team' | 'private';
+
+export interface FeedMediaItem {
+  type: 'image' | 'video' | 'document';
+  url: string;
+  name?: string | null;
+  size?: number | null;
+  poster?: string | null;
+}
+
+export interface FeedMention {
+  id?: string | null;
+  name: string;
+  role?: string | null;
+}
+
 export interface FeedPost {
   id: string;
   author_user_id: string;
@@ -411,9 +427,20 @@ export interface FeedPost {
   category: FeedCategory;
   content: string;
   image_url?: string | null;
+  media?: FeedMediaItem[] | null;
+  visibility?: PostVisibility | null;
+  location?: string | null;
+  project_id?: string | null;
+  project_title?: string | null;
+  hashtags?: string[] | null;
+  mentions?: FeedMention[] | null;
+  edited_at?: string | null;
+  repost_of?: string | null;
+  repost_caption?: string | null;
   likes_count: number;
   comments_count: number;
   liked_by_me?: boolean;
+  saved_by_me?: boolean;
   created_at: string;
 }
 
@@ -424,6 +451,7 @@ export interface FeedComment {
   author_name: string;
   author_role: string;
   author_photo_url?: string | null;
+  parent_id?: string | null;
   content: string;
   created_at: string;
 }
