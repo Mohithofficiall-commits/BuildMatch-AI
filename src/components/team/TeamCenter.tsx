@@ -605,7 +605,8 @@ function DetailBody({ row, project, onRequest, collab }: {
   collab?: string[];
 }) {
   const p = row.kind === 'engineer' ? row.engineer : row.profile;
-  const type = row.kind === 'engineer' ? 'engineer' as const : row.profile.profession;
+  // Profile rows reach this modal only through the four portal roles, so narrowing is safe.
+  const type: ProfessionalType = row.kind === 'engineer' ? 'engineer' : (row.profile.profession as ProfessionalType);
   const name = row.kind === 'profile' ? (row.profile.business_name ?? row.profile.name) : p.name;
   const photo = row.kind === 'profile' ? row.profile.photo_url : p.photo_url;
   const verified = p.verification_status === 'verified';

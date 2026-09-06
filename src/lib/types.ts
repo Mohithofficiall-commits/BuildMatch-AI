@@ -2,6 +2,17 @@ export type UserRole = 'homeowner' | 'engineer' | 'plumber' | 'electrician' | 'm
 
 export type ProfessionalType = 'engineer' | 'plumber' | 'electrician' | 'material_shop';
 
+/** Construction trades available in the homeowner "Construction Team" directory. */
+export type ConstructionProfession =
+  | 'plumber'
+  | 'electrician'
+  | 'material_shop'
+  | 'carpenter'
+  | 'mason'
+  | 'painter'
+  | 'fabricator'
+  | 'hvac';
+
 export interface AppUser {
   id: string;
   name: string;
@@ -205,6 +216,13 @@ export interface MatchResult {
   explanation: string;
 }
 
+export interface ProfessionalMatchResult {
+  profile: ProfessionalProfile;
+  overallScore: number;
+  factors: MatchFactor[];
+  explanation: string;
+}
+
 // ============================================================
 // Ecosystem Extension Types
 // ============================================================
@@ -212,7 +230,7 @@ export interface MatchResult {
 export interface ProfessionalProfile {
   id: string;
   user_id: string;
-  profession: 'plumber' | 'electrician' | 'material_shop';
+  profession: ConstructionProfession;
   business_name?: string | null;
   name: string;
   email?: string | null;

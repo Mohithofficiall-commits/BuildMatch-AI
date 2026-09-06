@@ -6,7 +6,7 @@ import { roleLandingPath } from '@/lib/portal';
 import { personPhoto } from '@/lib/people';
 import type { UserRole } from '@/lib/types';
 
-const ALL_ROLES: UserRole[] = ['homeowner', 'engineer', 'plumber', 'electrician', 'material_shop', 'admin'];
+const ALL_ROLES: UserRole[] = ['homeowner', 'engineer', 'material_shop', 'admin'];
 
 const DEMO_ACCOUNTS: Record<string, { id: string; name: string; role: UserRole; location: string; avatar_url: string }> = {
   'nishi.sharma@example.com': { id: 'a1000000-0000-0000-0000-000000000001', name: 'Nishi Sharma', role: 'homeowner', location: 'Coimbatore', avatar_url: '/people/homeowner-1.jpg' },

@@ -20,6 +20,8 @@ export const DEMO_PHOTOS: Record<string, string> = {
   carpenter: `${PEOPLE}/carpenter-1.jpg`,
   mason: `${PEOPLE}/mason-1.jpg`,
   painter: `${PEOPLE}/painter-1.jpg`,
+  fabricator: `${PEOPLE}/contractor-1.jpg`,
+  hvac: `${PEOPLE}/mechanic-1.jpg`,
   contractor: `${PEOPLE}/contractor-1.jpg`,
   site_supervisor: `${PEOPLE}/supervisor-1.jpg`,
   supervisor: `${PEOPLE}/supervisor-1.jpg`,

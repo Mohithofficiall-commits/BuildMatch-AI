@@ -7,6 +7,7 @@ import { rankEngineers } from '@/lib/matching';
 import type { Engineer, Project, ProjectRequirement } from '@/lib/types';
 import { Badge, RatingStars, TrustBadge, LoadingState, formatINR } from '@/components/ui';
 import { personPhoto, onPersonImgError } from '@/lib/people';
+import ConstructionTeam from '@/components/team/ConstructionTeam';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -226,6 +227,9 @@ export default function Dashboard() {
           </button>
         ))}
       </div>
+
+      {/* Construction Team — below Digital Passport */}
+      <ConstructionTeam req={req} />
     </div>
   );
 }
