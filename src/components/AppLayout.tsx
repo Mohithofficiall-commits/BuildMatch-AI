@@ -4,7 +4,7 @@ import { useCompare } from '@/lib/compare';
 import {
   LayoutDashboard, Search, GitCompareArrows, Sparkles, FolderKanban,
   MessageSquare, FolderLock, Wallet, Star, AlertTriangle, FileBadge,
-  LogOut, Menu, HardHat,
+  LogOut, Menu, HardHat, Construction,
 } from 'lucide-react';
 import { useState } from 'react';
 import { personPhoto, onPersonImgError } from '@/lib/people';
@@ -21,6 +21,7 @@ const navItems = [
   { to: '/app/reviews', label: 'Reviews', icon: Star },
   { to: '/app/complaints', label: 'Complaints', icon: AlertTriangle },
   { to: '/app/digital-passport', label: 'Digital Passport', icon: FileBadge },
+  { to: '/app/construction-team', label: 'Construction Team', icon: Construction },
 ];
 
 export default function AppLayout() {

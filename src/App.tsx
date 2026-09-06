@@ -18,6 +18,7 @@ import Payments from '@/pages/Payments';
 import Reviews from '@/pages/Reviews';
 import Complaints from '@/pages/Complaints';
 import DigitalPassport from '@/pages/DigitalPassport';
+import ConstructionTeamPage from '@/pages/ConstructionTeamPage';
 import AdminDashboard from '@/pages/AdminDashboard';
 import EngineerHomePage from '@/pages/portal/EngineerHomePage';
 // Professional portal pages (engineer / plumber / electrician / material shop)
@@ -77,6 +78,7 @@ function AppRoutes() {
         <Route path="reviews" element={<Reviews />} />
         <Route path="complaints" element={<Complaints />} />
         <Route path="digital-passport" element={<DigitalPassport />} />
+        <Route path="construction-team" element={<ConstructionTeamPage />} />
       </Route>
 
       {/* Engineer portal — professional network home as the index route */}

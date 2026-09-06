@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, MapPin, Home, Ruler, Wallet, Palette, ArrowRight, ShieldCheck, Sparkles, GitCompareArrows, CheckCircle2, TrendingUp, Star, FileBadge, Camera } from 'lucide-react';
+import { Search, MapPin, Home, Ruler, Wallet, Palette, ArrowRight, ShieldCheck, Sparkles, GitCompareArrows, CheckCircle2, TrendingUp, Star, FileBadge, Camera, Users } from 'lucide-react';
 import { useAuth } from '@/lib/auth';
 import { fetchEngineers, fetchProjects } from '@/lib/data';
 import { rankEngineers } from '@/lib/matching';
 import type { Engineer, Project, ProjectRequirement } from '@/lib/types';
 import { Badge, RatingStars, TrustBadge, LoadingState, formatINR } from '@/components/ui';
 import { personPhoto, onPersonImgError } from '@/lib/people';
-import ConstructionTeam from '@/components/team/ConstructionTeam';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -228,8 +227,22 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {/* Construction Team — below Digital Passport */}
-      <ConstructionTeam req={req} />
+      {/* Construction Team — now its own page, see sidebar → Construction Team */}
+      <button
+        onClick={() => navigate('/app/construction-team')}
+        className="card p-5 text-left card-hover group w-full"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-navy-50 text-navy-700 flex items-center justify-center group-hover:bg-royal-50 group-hover:text-royal-700 transition-colors">
+            <Users className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="font-semibold text-navy-900">Construction Team</p>
+            <p className="text-sm muted mt-0.5">Find, compare and AI-match the right professionals for your project</p>
+          </div>
+          <ArrowRight className="w-4 h-4 text-navy-300 group-hover:text-royal-600 ml-auto transition-colors" />
+        </div>
+      </button>
     </div>
   );
 }
