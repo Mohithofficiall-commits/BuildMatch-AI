@@ -10,6 +10,7 @@ node_modules
 dist
 dist-ssr
 *.local
+BuildMatch-source.zip
 
 .vscode/*
 !.vscode/extensions.json
@@ -23,3 +24,4 @@ dist-ssr
 .env
 .vercel
 .env*
+!.env.example
