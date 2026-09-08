@@ -13,6 +13,12 @@
 </p>
 
 <p align="center">
+  <a href="https://buildmatch-ai.vercel.app">
+    <img src="https://img.shields.io/badge/🚀%20LIVE%20DEMO-Launch%20App-6D5EF9?style=for-the-badge" alt="Live Demo">
+  </a>
+</p>
+
+<p align="center">
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-feature-map">Features</a> •
   <a href="#-explainable-matching-engine">Matching Engine</a> •
@@ -266,6 +272,10 @@ buildmatch/
 
 ## ⚙️ Quick Start
 
+**Live app:** [buildmatch-ai.vercel.app](https://buildmatch-ai.vercel.app) — no install needed to try it.
+
+To run it locally instead:
+
 ```bash
 # 1. Frontend
 cd frontend
@@ -410,6 +420,10 @@ Add the project's selected open-source license here before public distribution.
 
 <p align="center">
   <img src="https://readme-typing-svg.demolab.com?font=Space+Grotesk&size=20&duration=2600&pause=900&color=00C2A8&center=true&vCenter=true&width=620&lines=Every+match%2C+explained;Not+just+scored" alt="closing animation" />
+</p>
+
+<p align="center">
+  <a href="https://buildmatch-ai.vercel.app"><img src="https://img.shields.io/badge/🚀%20TRY%20THE%20LIVE%20APP-6D5EF9?style=for-the-badge" alt="Try the live app"></a>
 </p>
 
 <p align="center"><strong>BuildMatch AI — matching people to projects, with the reasoning shown.</strong></p>
