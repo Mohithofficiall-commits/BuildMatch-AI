@@ -19,9 +19,7 @@ export default function ConstructionTeamPage() {
       {/* Requirements quick-editor */}
       <div className="card p-6">
         <h2 className="text-lg font-bold text-navy-900 mb-1">Project Requirements</h2>
-        <p className="muted text-sm mb-4">
-          AI recommendations are ranked against these requirements. Adjust them and the team matches update instantly.
-        </p>
+        <p className="muted text-sm mb-4">AI team matches update instantly as you adjust these.</p>
         <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div>
             <label className="label"><MapPin className="w-3.5 h-3.5 inline mr-1" />Location</label>

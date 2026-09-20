@@ -85,7 +85,7 @@ export default function CompareEngineers() {
           <Trophy className="w-6 h-6 text-royal-600" />
           <div>
             <p className="font-semibold text-navy-900">Best Match: {engineers.find((e) => e.id === bestId)?.name}</p>
-            <p className="text-sm muted">BuildMatch recommends this engineer based on your project requirements (Coimbatore, 2BHK, ₹28 Lakhs, Modern style).</p>
+            <p className="text-sm muted">Recommended for your project: Coimbatore · 2BHK · ₹28 Lakhs · Modern.</p>
           </div>
         </div>
       </div>

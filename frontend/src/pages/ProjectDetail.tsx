@@ -454,7 +454,7 @@ export default function ProjectDetail() {
           <h2 className="text-lg font-bold text-navy-900">Milestone-Based Payments</h2>
           <button onClick={() => navigate('/app/payments')} className="btn-ghost text-sm">Full Details <ChevronRight className="w-4 h-4" /></button>
         </div>
-        <div className="grid grid-cols-3 gap-4 mb-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
           <div className="bg-navy-50 rounded-xl p-4 text-center"><p className="text-xs muted">Total Budget</p><p className="text-lg font-bold text-navy-900">{formatINR(project.budget)}</p></div>
           <div className="bg-emerald-50 rounded-xl p-4 text-center"><p className="text-xs muted">Paid</p><p className="text-lg font-bold text-emerald-700">{formatINR(totalPaid)}</p></div>
           <div className="bg-amber-50 rounded-xl p-4 text-center"><p className="text-xs muted">Remaining</p><p className="text-lg font-bold text-amber-700">{formatINR(remaining)}</p></div>

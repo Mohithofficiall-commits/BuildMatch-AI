@@ -2,6 +2,7 @@ node_modules/
 .env
 .env.*
 !.env.example
+.freebuff/
 dist/
 .DS_Store
 *.zip

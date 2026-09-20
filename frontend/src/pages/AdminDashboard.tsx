@@ -9,6 +9,7 @@ import { LoadingState, Badge, Toast, formatDate } from '@/components/ui';
 import { verificationStatus } from '@/components/professional/statuses';
 import { ShieldCheck, AlertTriangle, Camera, Star, CheckCircle2, XCircle, FileText, FolderKanban, Award, Send } from 'lucide-react';
 import { personPhoto, onPersonImgError, onProjectImgError } from '@/lib/people';
+import HelpingAIAssistant from '@/components/HelpingAIAssistant';
 
 export default function AdminDashboard() {
   const [engineers, setEngineers] = useState<Engineer[]>([]);
@@ -290,6 +291,9 @@ export default function AdminDashboard() {
           )}
         </div>
       )}
+
+      {/* BuildMatch Helping AI — platform ops copilot */}
+      <HelpingAIAssistant />
     </div>
   );
 }

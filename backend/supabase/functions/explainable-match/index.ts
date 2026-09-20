@@ -71,6 +71,14 @@ interface ProfessionalRow {
   price_range: string | null;
 }
 
+// Role → profession values in professional_profiles.profession
+const TEAM_ROLES: { key: keyof Omit<MatchResponse["teamRecommendation"], "engineer">; professions: string[] }[] = [
+  { key: "plumber", professions: ["plumber"] },
+  { key: "electrician", professions: ["electrician"] },
+  { key: "carpenter", professions: ["carpenter"] },
+  { key: "supplier", professions: ["material_shop"] },
+];
+
 interface MatchFactor {
   label: string;
   score: number;       // 0-100
@@ -485,25 +493,25 @@ function scoreProfessional(p: ProfessionalRow, req: ProjectRequirement): MatchRe
 // ----------------------------------------------------------------
 
 function assembleTeam(
-  profResults: MatchResult[]
+  profResults: MatchResult[],
+  profRows: ProfessionalRow[]
 ): MatchResponse["teamRecommendation"] {
-  const pick = (role: string) =>
-    profResults.find((r) => {
-      // name-based heuristic for demo; real data would use profession field
-      const n = r.name.toLowerCase();
-      if (role === "plumber") return n.includes("plumb") || r.factors.some((f) => f.reason.toLowerCase().includes("plumb"));
-      if (role === "electrician") return n.includes("electric") || r.factors.some((f) => f.reason.toLowerCase().includes("electric"));
-      if (role === "carpenter") return n.includes("carpent") || n.includes("wood") || r.factors.some((f) => f.reason.toLowerCase().includes("carpent"));
-      if (role === "supplier") return n.includes("mart") || n.includes("supply") || n.includes("material");
-      return false;
-    }) ?? null;
+  const pick = (professions: string[]) => {
+    // Result ids match professional_profiles.id — join back to the real
+    // profession column instead of guessing from names.
+    const row = profResults.find((r) => {
+      const p = profRows.find((row) => row.id === r.id);
+      return p ? professions.includes(p.profession) : false;
+    });
+    return row ?? null;
+  };
 
   return {
     engineer: null, // filled by caller from engineerResults
-    plumber: pick("plumber"),
-    electrician: pick("electrician"),
-    carpenter: pick("carpenter"),
-    supplier: pick("supplier"),
+    plumber: pick(TEAM_ROLES[0].professions),
+    electrician: pick(TEAM_ROLES[1].professions),
+    carpenter: pick(TEAM_ROLES[2].professions),
+    supplier: pick(TEAM_ROLES[3].professions),
   };
 }
 
@@ -557,7 +565,7 @@ serve(async (req) => {
       .sort((a, b) => b.overallScore - a.overallScore);
 
     // Assemble recommended team
-    const team = assembleTeam(professionalResults);
+    const team = assembleTeam(professionalResults, professionals ?? []);
     team.engineer = engineerResults[0] ?? null;
 
     // Build response

@@ -76,7 +76,7 @@ export default function PortalClientsPage() {
         <p className="muted mt-1">Homeowners and buyers you work with — built from real requests, projects and orders</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="card p-5 text-center"><p className="text-3xl font-bold text-navy-900">{clients.length}</p><p className="text-xs muted mt-1">{isShop ? 'Customers' : 'Clients'}</p></div>
         <div className="card p-5 text-center"><p className="text-3xl font-bold text-navy-900">{clients.reduce((s, c) => s + c.projects, 0)}</p><p className="text-xs muted mt-1">Projects</p></div>
         <div className="card p-5 text-center"><p className="text-3xl font-bold text-emerald-600">{formatINR(clients.reduce((s, c) => s + c.revenue, 0))}</p><p className="text-xs muted mt-1">Total Earned</p></div>

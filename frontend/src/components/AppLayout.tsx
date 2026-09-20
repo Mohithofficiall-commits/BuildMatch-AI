@@ -4,16 +4,18 @@ import { useCompare } from '@/lib/compare';
 import {
   LayoutDashboard, Search, GitCompareArrows, Sparkles, FolderKanban,
   MessageSquare, FolderLock, Wallet, Star, AlertTriangle, FileBadge,
-  LogOut, Menu, HardHat, Construction,
+  LogOut, Menu, HardHat, Construction, Sofa,
 } from 'lucide-react';
 import { useState } from 'react';
 import { personPhoto, onPersonImgError } from '@/lib/people';
+import HelpingAIAssistant from '@/components/HelpingAIAssistant';
 
 const navItems = [
   { to: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/app/find-engineers', label: 'Find Engineers', icon: Search },
   { to: '/app/compare', label: 'Compare Engineers', icon: GitCompareArrows },
   { to: '/app/ai-match', label: 'AI Match', icon: Sparkles },
+  { to: '/app/ai-interior-design', label: 'AI Interior Design', icon: Sofa },
   { to: '/app/projects', label: 'My Projects', icon: FolderKanban },
   { to: '/app/messages', label: 'Messages', icon: MessageSquare },
   { to: '/app/documents', label: 'Document Vault', icon: FolderLock },
@@ -124,6 +126,9 @@ export default function AppLayout() {
           <Outlet />
         </main>
       </div>
+
+      {/* BuildMatch Helping AI — follows the user across every app page */}
+      <HelpingAIAssistant />
     </div>
   );
 }

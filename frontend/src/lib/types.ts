@@ -11,7 +11,9 @@ export type ConstructionProfession =
   | 'mason'
   | 'painter'
   | 'fabricator'
-  | 'hvac';
+  | 'hvac'
+  | 'interior_designer'
+  | 'furniture_provider';
 
 export interface AppUser {
   id: string;

@@ -214,12 +214,12 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
 
   const verdict =
     noData
-      ? 'Not enough data to evaluate this team — no professionals are engaged on the project yet. Request professionals to start building your team.'
+      ? 'No professionals engaged yet — request professionals below to build your team.'
       : incompleteRoles.length > 0
-        ? `Not enough data for a full team fit — ${incompleteRoles.map((r) => r.replace('_', ' ')).join(', ')} ${incompleteRoles.length === 1 ? 'is' : 'are'} not engaged yet. Engaged professionals are checked below against real profile data.`
+        ? `Partial fit — ${incompleteRoles.map((r) => r.replace('_', ' ')).join(', ')} not engaged yet. Engaged roles are evaluated below.`
         : verifiedCount === 4
-          ? 'All four roles are engaged and verified. The recorded profiles, locations and credentials fit this project — this is your working team.'
-          : `${engagedCount} of 4 roles are engaged (${verifiedCount} verified). Fit is evaluated below from real profile data; no simulated compatibility score is used.`;
+          ? 'All four roles engaged and verified — this is your working team.'
+          : `${engagedCount} of 4 roles engaged (${verifiedCount} verified). Fit evaluated from real profile data.`;
 
   return (
     <div className="space-y-6">
@@ -232,7 +232,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
               <h2 className="text-lg font-bold text-navy-900">Recommended Engineers</h2>
               <Badge variant="royal">AI match</Badge>
             </div>
-            <p className="text-xs muted">Ranked with the existing BuildMatch matching engine against this project's real requirements ({project.location}, {project.house_type}, {formatINR(project.budget)}).</p>
+            <p className="text-xs muted">Ranked against this project: {project.location}, {project.house_type}, {formatINR(project.budget)}.</p>
           </div>
           <div className="flex gap-2">
             <button onClick={() => navigate('/app/ai-match')} className="btn-ghost text-sm">Full AI Match</button>
@@ -307,7 +307,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
           <Badge variant="navy">{focusedEngineer ? focusedEngineer.name : 'No engineer selected'}</Badge>
         </div>
         <p className="text-xs muted mb-4">
-          Shows only real data recorded for this project — project members, requests and accepted professionals. BuildMatch has no recorded engineer-to-professional endorsements yet, so nothing is guessed. Candidates listed below are directory professionals operating in this area, ready for you to request.
+          Real project members, requests and accepted professionals only. Candidates below are directory professionals in this area.
         </p>
 
         {!focusedEngineer && (
@@ -407,7 +407,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
           <ShieldCheck className="w-5 h-5 text-emerald-600" />
           <h2 className="text-lg font-bold text-navy-900">Team Match — fit against this project</h2>
         </div>
-        <p className="text-xs muted mb-4">Every check is computed from real database fields. Where data is missing the row shows “—”; no simulated scores are produced.</p>
+        <p className="text-xs muted mb-4">Computed from real database fields — missing data shows “—”.</p>
 
         {noData ? (
           <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3">{verdict}</p>
@@ -456,7 +456,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
           <ArrowDown className="w-5 h-5 text-royal-600" />
           <h2 className="text-lg font-bold text-navy-900">Recommended Project Team</h2>
         </div>
-        <p className="text-xs muted mb-4">The working team recorded for this project. Unfilled roles are waiting for a request or acceptance — nothing is assumed.</p>
+        <p className="text-xs muted mb-4">Roles recorded for this project. Unfilled roles await a request or acceptance.</p>
 
         <div className="max-w-xl mx-auto">
           {ROLE_ORDER.map((role, i) => {
@@ -494,7 +494,7 @@ export default function TeamCenter({ project, engineers, profiles, members, proR
           <GitCompareArrows className="w-5 h-5 text-royal-600" />
           <h2 className="text-lg font-bold text-navy-900">Compare Professionals</h2>
         </div>
-        <p className="text-xs muted mb-3">Pick up to 4 candidates in one category. “Recommended” marks professionals already engaged on this project — only real team members are flagged.</p>
+        <p className="text-xs muted mb-3">Select up to 4 per category. “Recommended” = already engaged on this project.</p>
 
         <div className="flex gap-2 flex-wrap mb-4">
           {ROLE_ORDER.map((r) => (
@@ -642,9 +642,9 @@ function DetailBody({ row, project, onRequest, collab }: {
       <DetailLine label={row.kind === 'engineer' ? 'Specialisations' : 'Specialisations / skills'} value={p.specializations.concat(row.kind === 'profile' ? row.profile.skills : []).slice(0, 8).join(', ') || '—'} />
 
       {row.kind === 'engineer' ? (
-        <DetailLine label="Why recommended" value="Ranked by the BuildMatch matching engine using this project's location, budget, house type, area and style." />
+        <DetailLine label="Why recommended" value="Ranked by the matching engine on location, budget, house type, area and style." />
       ) : (
-        <DetailLine label="Why listed" value="Directory professional operating in this area for the project — no fabricated recommendation or score is used." />
+        <DetailLine label="Why listed" value="Directory professional operating in this project area." />
       )}
 
       {collab && collab.length > 0 ? (

@@ -71,9 +71,18 @@ const demoUsers: Record<UserRole, AppUser> = {
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AppUser | null>(null);
 
-  const login = useCallback((u: AppUser) => setUser(u), []);
-  const logout = useCallback(() => setUser(null), []);
-  const demoLogin = useCallback((role: UserRole) => setUser(demoUsers[role]), []);
+  // Mirror the session user id into sessionStorage so non-React modules
+  // (the AI client) can identify the caller to backend Edge Functions.
+  const persist = useCallback((u: AppUser | null) => {
+    try {
+      if (u) sessionStorage.setItem('buildmatch-user-id', u.id);
+      else sessionStorage.removeItem('buildmatch-user-id');
+    } catch { /* storage unavailable */ }
+  }, []);
+
+  const login = useCallback((u: AppUser) => { persist(u); setUser(u); }, [persist]);
+  const logout = useCallback(() => { persist(null); setUser(null); }, [persist]);
+  const demoLogin = useCallback((role: UserRole) => { persist(demoUsers[role]); setUser(demoUsers[role]); }, [persist]);
 
   return <AuthContext.Provider value={{ user, login, logout, demoLogin }}>{children}</AuthContext.Provider>;
 }

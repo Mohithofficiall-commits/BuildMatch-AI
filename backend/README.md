@@ -14,20 +14,74 @@ backend/
 │   ├── 20260905200000_network_feed.sql                 # Social feed
 │   ├── 20260905210000_social_posts.sql                 # Rich posts + media bucket
 │   ├── 20260906010000_construction_team.sql            # Construction trades
-│   └── 20260908010000_match_audit_log.sql              # Match engine audit log
+│   ├── 20260908010000_match_audit_log.sql              # Match engine audit log
+│   ├── 20260916010000_ai_matching_expansion.sql        # Interior designers + furniture providers
+│   └── 20260918010000_backend_automation.sql           # Triggers: progress sync, notifications, updated_at
 ├── supabase/
 │   └── config.toml               # Local dev config (supabase start)
 └── supabase/
     └── functions/
-        └── explainable-match/    # Explainable Intelligent Matching Engine
-            └── index.ts          # Edge Function: server-side scoring + explanations
+        ├── explainable-match/    # Explainable Intelligent Matching Engine
+        │   └── index.ts          # Edge Function: server-side scoring + explanations
+        ├── ai-assistant/         # Helping AI chat proxy (server-held provider key)
+        │   └── index.ts
+        └── interior-design/      # AI Interior Design vision proxy (server-held key)
+            └── index.ts
 ```
 
 ## Applying migrations
 
 In Supabase Dashboard → **SQL Editor**, run each file **in filename order** (oldest first). All migrations are additive — they never drop or replace existing tables.
 
-If you only want the core app (projects, engineers, AI match), the first two suffice. The later ones add the professional portals, social feed, and construction-trades directory.
+If you only want the core app (projects, engineers, AI match), the first two suffice. The later ones add the professional portals, social feed, and construction-trades directory. The final migration extends the AI matching directory to interior designers and furniture providers.
+
+## AI — REAL Google Gemini (backend-only)
+
+All AI runs through the official `@google/genai` SDK inside the Edge Functions.
+The API key NEVER reaches the browser.
+
+```
+Frontend → Supabase Edge Function (GEMINI_API_KEY secret) → Google Gemini API
+```
+
+### Activate (2 commands)
+
+```bash
+supabase secrets set GEMINI_API_KEY=your_real_key      # https://aistudio.google.com/apikey
+supabase functions deploy ai-assistant interior-design
+```
+
+`GEMINI_MODEL` secret is optional (default: `gemini-3.6-flash`).
+
+### What each function does
+
+| Function | Ops | Grounding |
+|---|---|---|
+| `ai-assistant` | `analyze` (structured JSON), `chat`, `health` | Loads the caller's REAL project + milestones + payments + documents + evidence + reviews + complaints, plus the real engineer/professional directory. Role-checked: homeowners → own projects; engineers → assigned/member projects; admin → platform queues. |
+| `interior-design` | vision analysis | Real Gemini vision on the uploaded photo + the homeowner's inputs; returns the exact `InteriorDesignResult` contract. |
+
+`analyze` response shape: `{ answer, recommendations[{name, reason, confidence}], risks[{title, severity, reason}], nextActions[], missingInformation[], confidence, model }`.
+
+### Security
+
+- Key only in Supabase secrets (`GEMINI_API_KEY`) — never in `VITE_*` vars, never in responses, never logged. Health op returns `configured: true/false` + model name only.
+- `.env.example` files document the variables without real values; `.gitignore` excludes `.env*`.
+- System instruction forbids inventing users, engineers, ratings, certifications or progress; missing information is reported as missing.
+
+## Database automation (20260918010000_backend_automation.sql)
+
+Server-side triggers keep derived data and notifications consistent without
+any client involvement:
+
+| Trigger | Table | What it does |
+|---|---|---|
+| `trg_milestones_sync_progress` | milestones | Recalculates `projects.progress` on every milestone change (completed = full, in-progress = half) |
+| `trg_projects_lifecycle` | projects | Auto-completes the project at 100% progress (stamps `actual_completion`); clears it if reopened |
+| `trg_notify_*` | milestones, payments, professional_requests, reviews, verification_requests, material_orders | Inserts `notifications` rows for homeowners, professionals and buyers on lifecycle transitions |
+| `trg_*_updated_at` | material_orders, professional_requests | Maintains `updated_at` |
+
+All notifications link to real application routes (role-aware for portals).
+All triggers are `DROP TRIGGER IF EXISTS` + re-create, so the migration is safe to re-run.
 
 ## Explainable Intelligent Matching Engine
 

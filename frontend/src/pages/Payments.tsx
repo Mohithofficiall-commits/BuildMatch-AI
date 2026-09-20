@@ -57,7 +57,7 @@ export default function Payments() {
           <div className="grid lg:grid-cols-3 gap-6">
             <div className="card p-6 lg:col-span-2">
               <h2 className="text-lg font-bold text-navy-900 mb-4">Payment Summary</h2>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="bg-navy-50 rounded-xl p-4 text-center"><p className="text-xs muted">Total Budget</p><p className="text-xl font-bold text-navy-900 mt-1">{formatINR(budget)}</p></div>
                 <div className="bg-emerald-50 rounded-xl p-4 text-center"><p className="text-xs muted">Paid</p><p className="text-xl font-bold text-emerald-700 mt-1">{formatINR(totalPaid)}</p></div>
                 <div className="bg-amber-50 rounded-xl p-4 text-center"><p className="text-xs muted">Remaining</p><p className="text-xl font-bold text-amber-700 mt-1">{formatINR(budget - totalPaid)}</p></div>

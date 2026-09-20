@@ -60,7 +60,20 @@ export default function Messages() {
       {projects.length === 0 ? (
         <EmptyState icon={<MessageSquare className="w-7 h-7" />} title="No conversations" description="Start a project to begin messaging with your engineer." />
       ) : (
-        <div className="card overflow-hidden flex h-[600px]">
+        <div className="card overflow-hidden flex flex-col md:flex-row h-[520px] md:h-[600px]">
+          {/* Mobile: project switcher (the sidebar list is hidden below md) */}
+          <div className="md:hidden border-b border-navy-100 p-3">
+            <select
+              className="input text-sm"
+              value={selectedProject ?? ''}
+              onChange={(e) => setSelectedProject(e.target.value)}
+              aria-label="Select project conversation"
+            >
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>{p.title}{p.engineer?.name ? ` · ${p.engineer.name}` : ''}</option>
+              ))}
+            </select>
+          </div>
           <div className="w-72 border-r border-navy-100 flex-col hidden md:flex">
             <div className="p-3 border-b border-navy-100">
               <div className="relative">

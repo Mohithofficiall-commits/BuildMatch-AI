@@ -39,7 +39,7 @@ export default function Reviews() {
         <button onClick={() => setWriteOpen(true)} className="btn-primary"><Plus className="w-4 h-4" /> Write Review</button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="card p-5 text-center"><p className="text-3xl font-bold text-navy-900">{avgRating}</p><div className="flex justify-center mt-1"><RatingStars rating={+avgRating} /></div><p className="text-xs muted mt-1">Average Rating</p></div>
         <div className="card p-5 text-center"><p className="text-3xl font-bold text-navy-900">{verified.length}</p><p className="text-xs muted mt-1">Verified Reviews</p></div>
         <div className="card p-5 text-center"><p className="text-3xl font-bold text-navy-900">{engineers.length}</p><p className="text-xs muted mt-1">Engineers Reviewed</p></div>

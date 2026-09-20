@@ -10,6 +10,7 @@ import FindEngineers from '@/pages/FindEngineers';
 import EngineerProfile from '@/pages/EngineerProfile';
 import CompareEngineers from '@/pages/CompareEngineers';
 import AIMatch from '@/pages/AIMatch';
+import AIInteriorDesign from '@/pages/AIInteriorDesign';
 import MyProjects from '@/pages/MyProjects';
 import ProjectDetail from '@/pages/ProjectDetail';
 import Messages from '@/pages/Messages';
@@ -70,6 +71,7 @@ function AppRoutes() {
         <Route path="engineers/:id" element={<EngineerProfile />} />
         <Route path="compare" element={<CompareEngineers />} />
         <Route path="ai-match" element={<AIMatch />} />
+        <Route path="ai-interior-design" element={<AIInteriorDesign />} />
         <Route path="projects" element={<MyProjects />} />
         <Route path="projects/:id" element={<ProjectDetail />} />
         <Route path="messages" element={<Messages />} />
@@ -114,7 +116,7 @@ export default function App() {
   return (
     <AuthProvider>
       <CompareProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL}>
           <AppRoutes />
         </BrowserRouter>
       </CompareProvider>

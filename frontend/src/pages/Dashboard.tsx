@@ -7,6 +7,7 @@ import { rankEngineers } from '@/lib/matching';
 import type { Engineer, Project, ProjectRequirement } from '@/lib/types';
 import { Badge, RatingStars, TrustBadge, LoadingState, formatINR } from '@/components/ui';
 import { personPhoto, onPersonImgError } from '@/lib/people';
+import { Sofa } from 'lucide-react';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -61,9 +62,45 @@ export default function Dashboard() {
         <div className="relative">
           <p className="text-royal-300 text-sm font-medium mb-2">Welcome back, {user?.name?.split(' ')[0]}</p>
           <h1 className="text-2xl lg:text-3xl font-bold mb-2">Find the Right Engineer for Your Dream Home</h1>
-          <p className="text-navy-200 max-w-2xl">Enter your project requirements and get AI-powered, explainable engineer recommendations.</p>
+          <p className="text-navy-200 max-w-2xl">AI-powered, explainable engineer recommendations — from requirements to handover.</p>
         </div>
       </div>
+
+      {/* Active project summary — first thing a returning homeowner needs */}
+      {activeProject && (
+        <div className="card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-navy-900">Active Project</h2>
+            <button onClick={() => navigate(`/app/projects/${activeProject.id}`)} className="btn-ghost text-sm">
+              View Details <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+          <div className="grid md:grid-cols-4 gap-4">
+            <div>
+              <p className="text-xs muted">Project</p>
+              <p className="font-semibold text-navy-900">{activeProject.title}</p>
+            </div>
+            <div>
+              <p className="text-xs muted">Engineer</p>
+              <p className="font-semibold text-navy-900">{activeProject.engineer?.name ?? 'Unassigned'}</p>
+            </div>
+            <div>
+              <p className="text-xs muted">Budget</p>
+              <p className="font-semibold text-navy-900">{formatINR(activeProject.budget)}</p>
+            </div>
+            <div>
+              <p className="text-xs muted">Progress</p>
+              <div className="flex items-center gap-2">
+                <div className="flex-1 h-2 bg-navy-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-royal-600 rounded-full transition-all duration-700" style={{ width: `${activeProject.progress}%` }} />
+                </div>
+                <span className="text-sm font-semibold text-navy-900">{activeProject.progress}%</span>
+              </div>
+              <p className="text-xs muted mt-1">Current: {activeProject.current_milestone}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Quick search */}
       <div className="card p-6">
@@ -110,48 +147,12 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Active project summary */}
-      {activeProject && (
-        <div className="card p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold text-navy-900">Active Project</h2>
-            <button onClick={() => navigate(`/app/projects/${activeProject.id}`)} className="btn-ghost text-sm">
-              View Details <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="grid md:grid-cols-4 gap-4">
-            <div>
-              <p className="text-xs muted">Project</p>
-              <p className="font-semibold text-navy-900">{activeProject.title}</p>
-            </div>
-            <div>
-              <p className="text-xs muted">Engineer</p>
-              <p className="font-semibold text-navy-900">{activeProject.engineer?.name ?? 'Unassigned'}</p>
-            </div>
-            <div>
-              <p className="text-xs muted">Budget</p>
-              <p className="font-semibold text-navy-900">{formatINR(activeProject.budget)}</p>
-            </div>
-            <div>
-              <p className="text-xs muted">Progress</p>
-              <div className="flex items-center gap-2">
-                <div className="flex-1 h-2 bg-navy-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-royal-600 rounded-full transition-all duration-700" style={{ width: `${activeProject.progress}%` }} />
-                </div>
-                <span className="text-sm font-semibold text-navy-900">{activeProject.progress}%</span>
-              </div>
-              <p className="text-xs muted mt-1">Current: {activeProject.current_milestone}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Top matched engineers */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-xl font-bold text-navy-900">Top Matched Engineers</h2>
-            <p className="muted text-sm">Explainable AI recommendations based on your requirements</p>
+            <p className="muted text-sm">Explainable AI recommendations for your requirements</p>
           </div>
           <button onClick={() => navigate('/app/ai-match')} className="btn-ghost text-sm">
             Full AI Match <ArrowRight className="w-4 h-4" />
@@ -211,10 +212,11 @@ export default function Dashboard() {
       </div>
 
       {/* Quick actions */}
-      <div className="grid md:grid-cols-3 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { icon: GitCompareArrows, title: 'Compare Engineers', desc: 'Side-by-side comparison of top matches', to: '/app/compare' },
           { icon: FileBadge, title: 'Digital Passport', desc: 'View your project verified digital record', to: '/app/digital-passport' },
+          { icon: Sofa, title: 'AI Interior Design', desc: 'Upload a room photo and get design suggestions', to: '/app/ai-interior-design' },
           { icon: Camera, title: 'Milestone Verification', desc: 'AI-assisted construction stage detection', to: `/app/projects/${activeProject?.id ?? ''}` },
         ].map((a) => (
           <button key={a.title} onClick={() => navigate(a.to)} className="card p-5 text-left card-hover group">

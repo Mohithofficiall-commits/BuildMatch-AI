@@ -62,7 +62,7 @@ export default function Complaints() {
         <button onClick={() => setCreateOpen(true)} className="btn-primary"><Plus className="w-4 h-4" /> Submit Complaint</button>
       </div>
 
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {(['open', 'under_review', 'resolved'] as const).map((s) => {
           const count = complaints.filter((c) => c.status === s).length;
           const cfg = statusConfig[s];

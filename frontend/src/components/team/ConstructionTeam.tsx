@@ -121,7 +121,7 @@ export default function ConstructionTeam({ req }: { req: ProjectRequirement }) {
           <Badge variant="royal">AI match</Badge>
         </div>
         <p className="text-xs muted mb-4">
-          Built from real directory data ranked against your requirements ({req.location}, {req.house_type} · {req.area_sqft} sq.ft · {formatINR(req.budget)}). Every score is explained — no simulated compatibility scores.
+          Ranked against your requirements: {req.location}, {req.house_type} · {req.area_sqft} sq.ft · {formatINR(req.budget)}.
         </p>
 
         <div className="max-w-2xl">
@@ -276,7 +276,7 @@ function TeamSlot({ emoji, label, name, verified, reason, onView }: {
   emoji: string; label: string; name: string | null; verified?: boolean; reason: string; onView?: () => void;
 }) {
   return (
-    <div className="w-full border border-navy-100 rounded-xl p-3 flex items-center gap-3 bg-white">
+    <div className="w-full min-w-0 border border-navy-100 rounded-xl p-3 flex items-center gap-3 bg-white">
       <div className="w-10 h-10 rounded-xl bg-royal-50 text-royal-700 flex items-center justify-center text-lg shrink-0">{emoji}</div>
       <div className="flex-1 min-w-0">
         <p className="text-[11px] uppercase tracking-wide text-navy-400 font-semibold">{label}</p>
@@ -298,7 +298,7 @@ function ProfessionalCard({ emoji, name, verified, location, experience, rating,
   explanation: string; price?: string; onView: () => void;
 }) {
   return (
-    <div className="border border-navy-100 rounded-xl p-5 card-hover hover:border-navy-200 transition-all">
+    <div className="min-w-0 border border-navy-100 rounded-xl p-5 card-hover hover:border-navy-200 transition-all">
       <div className="flex items-start gap-3 mb-3">
         <div className="w-12 h-12 rounded-xl bg-royal-50 text-royal-700 flex items-center justify-center text-xl shrink-0">{emoji}</div>
         <div className="flex-1 min-w-0">

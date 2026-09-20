@@ -5,6 +5,7 @@ import { PORTAL_TABS } from './portalTabs';
 import { HardHat, LogOut } from 'lucide-react';
 import { onPersonImgError } from '@/lib/people';
 import NotificationsBell from './NotificationsBell';
+import HelpingAIAssistant from '@/components/HelpingAIAssistant';
 
 export default function PortalLayout({ role }: { role: ProfessionalRole }) {
   const { user, logout } = useAuth();
@@ -110,6 +111,9 @@ export default function PortalLayout({ role }: { role: ProfessionalRole }) {
           <Outlet />
         </main>
       </div>
+
+      {/* BuildMatch Helping AI — follows the professional across every workspace page */}
+      <HelpingAIAssistant />
     </div>
   );
 }

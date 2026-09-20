@@ -1,15 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchEngineers } from '@/lib/data';
 import { rankEngineers, MATCH_WEIGHTS } from '@/lib/matching';
 import type { Engineer, ProjectRequirement } from '@/lib/types';
 import { Badge, RatingStars, TrustBadge, LoadingState, ProgressBar } from '@/components/ui';
-import { Sparkles, MapPin, Home, Ruler, Wallet, Palette, CalendarClock, ArrowRight, ShieldCheck, Info, TrendingUp } from 'lucide-react';
+import { Sparkles, MapPin, Home, Ruler, Wallet, Palette, CalendarClock, ArrowRight, ShieldCheck, Info, TrendingUp, ChevronDown } from 'lucide-react';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer } from 'recharts';
 import { personPhoto, onPersonImgError } from '@/lib/people';
+import AllServicesRecommendations from '@/components/AllServicesRecommendations';
 
 export default function AIMatch() {
-  const navigate = useNavigate();
   const [engineers, setEngineers] = useState<Engineer[]>([]);
   const [loading, setLoading] = useState(true);
   const [req, setReq] = useState<ProjectRequirement>({
@@ -37,7 +37,7 @@ export default function AIMatch() {
       </div>
 
       <div className="card p-6">
-        <h2 className="text-lg font-bold text-navy-900 mb-4">Your Project Requirements</h2>
+        <h2 className="text-lg font-bold text-navy-900 mb-4">Project Requirements</h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label className="label"><MapPin className="w-3.5 h-3.5 inline mr-1" />Location</label>
@@ -84,7 +84,7 @@ export default function AIMatch() {
           <Info className="w-5 h-5 text-royal-600 shrink-0 mt-0.5" />
           <div>
             <p className="font-semibold text-navy-900 text-sm">How the Match Score is calculated</p>
-            <p className="text-sm muted mt-1">The overall score is a transparent weighted sum of six factors. No black box — every score is explainable.</p>
+            <p className="text-sm muted mt-1">A transparent weighted sum of six factors — no black box.</p>
             <div className="flex flex-wrap gap-2 mt-3">
               {Object.entries(MATCH_WEIGHTS).map(([key, w]) => (
                 <Badge key={key} variant="royal">{key.replace(/([A-Z])/g, ' $1').replace(/^./, (s) => s.toUpperCase())} · {Math.round(w * 100)}%</Badge>
@@ -97,10 +97,25 @@ export default function AIMatch() {
       <div>
         <h2 className="text-xl font-bold text-navy-900 mb-4">Top 5 Engineer Recommendations</h2>
         <div className="space-y-4">
-          {matches.map((m, idx) => {
-            const radarData = m.factors.map((f) => ({ metric: f.label.split(' ')[0], value: f.score }));
-            return (
-              <div key={m.engineer.id} className={`card p-6 ${idx === 0 ? 'border-royal-200 shadow-glow' : ''}`}>
+          {matches.map((m, idx) => (
+            <EngineerMatchCard key={m.engineer.id} match={m} rank={idx} />
+          ))}
+        </div>
+      </div>
+
+      {/* Unified AI recommendations across all 7 service categories */}
+      <AllServicesRecommendations />
+    </div>
+  );
+}
+
+function EngineerMatchCard({ match: m, rank: idx }: { match: ReturnType<typeof rankEngineers>[number]; rank: number }) {
+  const navigate = useNavigate();
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const radarData = m.factors.map((f) => ({ metric: f.label.split(' ')[0], value: f.score }));
+
+  return (
+              <div className={`card p-6 ${idx === 0 ? 'border-royal-200 shadow-glow' : ''}`}>
                 <div className="grid lg:grid-cols-3 gap-6">
                   <div>
                     <div className="flex items-center gap-3 mb-3">
@@ -157,18 +172,23 @@ export default function AIMatch() {
                   <p className="text-sm text-navy-600">{m.explanation}</p>
                 </div>
 
-                <div className="mt-3 grid md:grid-cols-2 gap-2">
-                  {m.factors.map((f) => (
-                    <div key={f.label} className="text-xs muted flex items-start gap-1.5">
-                      <span className="font-semibold text-navy-700 shrink-0">{f.label}:</span> {f.reason}
-                    </div>
-                  ))}
-                </div>
+                {/* Per-factor reasons — secondary detail, collapsed by default */}
+                <button
+                  onClick={() => setDetailsOpen((v) => !v)}
+                  className="mt-3 flex items-center gap-1.5 text-sm text-royal-600 hover:text-royal-700 font-medium transition-colors"
+                >
+                  <ChevronDown className={`w-4 h-4 transition-transform ${detailsOpen ? 'rotate-180' : ''}`} />
+                  {detailsOpen ? 'Hide factor details' : 'Why each factor scored this way'}
+                </button>
+                {detailsOpen && (
+                  <div className="mt-2 grid md:grid-cols-2 gap-2 border-t border-navy-100 pt-3">
+                    {m.factors.map((f) => (
+                      <div key={f.label} className="text-xs muted flex items-start gap-1.5">
+                        <span className="font-semibold text-navy-700 shrink-0">{f.label}:</span> {f.reason}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
   );
 }
