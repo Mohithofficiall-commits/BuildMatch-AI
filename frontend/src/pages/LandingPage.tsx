@@ -72,9 +72,6 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-grid-navy [background-size:40px_40px] opacity-40" />
         <div className="relative max-w-7xl mx-auto px-4 lg:px-8 py-20 lg:py-28">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 badge-royal mb-6 animate-fade-in">
-              <Sparkles className="w-3.5 h-3.5" /> SIH Prototype · AI-Powered Construction Platform
-            </div>
             <h1 className="text-4xl lg:text-6xl font-extrabold text-navy-900 leading-[1.1] text-balance animate-slide-up">
               Build Your Dream Home<br />With Confidence.
             </h1>
