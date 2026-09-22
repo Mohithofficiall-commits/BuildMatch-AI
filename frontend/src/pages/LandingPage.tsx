@@ -262,7 +262,7 @@ export default function LandingPage() {
             </div>
             <span className="font-bold text-navy-900 text-sm">BuildMatch AI</span>
           </div>
-          <p className="text-xs muted">AI-assisted decision-support platform. Human verification required for all critical decisions. © 2026 BuildMatch AI · SIH Prototype</p>
+          <p className="text-xs muted">AI-assisted decision-support platform. Human verification required for all critical decisions. © 2026 BuildMatch AI</p>
         </div>
       </footer>
     </div>
