@@ -10,3 +10,6 @@ dist/
 .vercel/
 .tmp-logs/
 backend/supabase/.temp/
+
+# Supabase CLI state (root)
+/supabase/.temp/
